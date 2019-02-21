@@ -10,14 +10,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="My Everyday Discoveries">
   <meta name="author" content="Shreyas MM" />
-  <link rel="canonical" href="https://shreyasmm.com/">
-  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="https://shreyasmm.com/feed/"/>
+  <link rel="canonical" href="http://localhost:4000/">
+  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="http://localhost:4000/feed/"/>
   
   <!-- Opengraph Tags-->
   <meta property="og:locale" content="en_US" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Shreyas MM" />
-  <meta property="og:url" content="https://shreyasmm.com/" />
+  <meta property="og:url" content="http://localhost:4000/" />
   <meta property="og:title" content="Shreyas M M" />
   <meta property="og:description" content="My Everyday Discoveries" />
 
@@ -953,11 +953,11 @@ Licensed MIT
             
           
             
-            <li><a class="page-link" href="/about/">About</a></li>
+            <li><a class="page-link" href="/about">About</a></li>
             
           
             
-            <li><a class="page-link" href="/archives/">Archives</a></li>
+            <li><a class="page-link" href="/archives">Archives</a></li>
             
           
             
@@ -976,7 +976,83 @@ Licensed MIT
     <main id="main">
       <div class="wrapper">
   <h1></h1>
-  
+  <p><img src="/assets/images/tomcat-log-rotation.jpg" alt="Tomcat Log Rotation" /></p>
+
+<p>In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.</p>
+
+<p>In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in <code class="highlighter-rouge">/etc/logrotate.d</code></p>
+
+<p>I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from <a href="/">here</a>. Tomcat rotates the logs by itself in a default setup. which is configured in <code class="highlighter-rouge">/opt/tomcat/conf/logging.properties</code> file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.</p>
+
+<p>Add this lines to <code class="highlighter-rouge">/opt/tomcat/conf/logging.properties</code></p>
+
+<p>{% gist f2579a891905442906167c7d77a99198 %}</p>
+
+<p>I have added one line to each log entry <code class="highlighter-rouge">org.apache.juli.AsyncFileHandler.rotatable = false</code> to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.</p>
+
+<h4 id="logrotate-and-compression">Logrotate and Compression</h4>
+
+<p>create a new file at <code class="highlighter-rouge">/etc/logrotate.d/tomcat</code></p>
+
+<p>{% gist ec043a956c9d56580217f4824392ffc3 %}</p>
+
+<p><code class="highlighter-rouge">compress</code> – compress the log files
+<code class="highlighter-rouge">compresscmd</code> – command used for Compression, gzip
+<code class="highlighter-rouge">compressoptions</code> – options for compression command, Gzip Compression level 1-9
+<code class="highlighter-rouge">compressext</code> – extention of compressed file</p>
+
+<p>its just going to do <code class="highlighter-rouge">gzip -9 filename</code> , which compresses the file.</p>
+
+<p><code class="highlighter-rouge">dateext</code>
+<code class="highlighter-rouge">dateformat -%Y-%m-%d-%s</code>
+these lines add date extention to the rotated log file in the format <code class="highlighter-rouge">catalina.out-2018-09-21-1537501441</code></p>
+
+<p><code class="highlighter-rouge">nomail</code> tells not mail the log files</p>
+
+<p><code class="highlighter-rouge">copytruncate</code> – copies the log file to new file and truncates the log file to zero bytes.</p>
+
+<p><code class="highlighter-rouge">daily</code> – rotates the log file daily</p>
+
+<p><code class="highlighter-rouge">rotate 10</code> – keep the 10 past rotated logs</p>
+
+<p><code class="highlighter-rouge">notifempty</code> – do not rotate the log if it is empty</p>
+
+<p><code class="highlighter-rouge">missingok</code> – if the file is missing its ok</p>
+
+<p><code class="highlighter-rouge">create 0644 tomcat tomcat</code> – create the log file with these permissions, ignored if copy truncate is used.</p>
+
+<p><code class="highlighter-rouge">postrotate</code> – command to run after the log rotation.</p>
+
+<p>Here we are running the a custom Bash command to encrypt and move the log files to AWS S3</p>
+
+<h4 id="encryption-and-copying-to-aws-s3">Encryption and Copying to AWS S3</h4>
+
+<p>Create a Bash Shell Script <code class="highlighter-rouge">vim /usr/share/encrypt</code></p>
+
+<p>{% gist 64dac1afc1274878e1aa9a3ce1fac6ef %}</p>
+
+<p>Give it execute permissions</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x /usr/share/encrypt
+</code></pre></div></div>
+
+<p>This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>encrypt /opt/tomcat/log /data/key
+</code></pre></div></div>
+
+<p>Key is needed to encrypt and decrypt the file</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /data/key
+Big3secret
+</code></pre></div></div>
+
+<p>Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.</p>
+
+<p>For Decryption of files</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg <span class="nt">--batch</span> <span class="nt">--passphrase-file</span> /data/mykey <span class="nt">-d</span> catalina.out-2018-09-21-1537501441.gz.gpg <span class="o">&gt;</span> catalina.out-2018-09-21-1537501441.gz
+</code></pre></div></div>
 
 </div>
     </main>

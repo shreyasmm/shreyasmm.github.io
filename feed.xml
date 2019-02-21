@@ -1,463 +1,502 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://shreyasmm.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://shreyasmm.com/" rel="alternate" type="text/html" /><updated>2019-02-21T12:06:00+05:30</updated><id>https://shreyasmm.com/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T16:32:06+05:30</published><updated>2018-09-26T16:32:06+05:30</updated><id>https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">&lt;p&gt;&lt;img src=&quot;/assets/images/tomcat-log-rotation.jpg&quot; alt=&quot;Tomcat Log Rotation&quot; /&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-02-21T12:17:52+05:30</updated><id>http://localhost:4000/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="http://localhost:4000/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T16:32:06+05:30</published><updated>2018-09-26T16:32:06+05:30</updated><id>http://localhost:4000/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="http://localhost:4000/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">![Tomcat Log Rotation](/assets/images/tomcat-log-rotation.jpg)
 
-&lt;p&gt;In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.&lt;/p&gt;
+In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.
 
-&lt;p&gt;In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/logrotate.d&lt;/code&gt;&lt;/p&gt;
+In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in `/etc/logrotate.d`
 
-&lt;p&gt;I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from &lt;a href=&quot;/&quot;&gt;here&lt;/a&gt;. Tomcat rotates the logs by itself in a default setup. which is configured in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/conf/logging.properties&lt;/code&gt; file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.&lt;/p&gt;
+I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from [here](/). Tomcat rotates the logs by itself in a default setup. which is configured in `/opt/tomcat/conf/logging.properties` file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.
 
-&lt;p&gt;Add this lines to &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/conf/logging.properties&lt;/code&gt;&lt;/p&gt;
+Add this lines to `/opt/tomcat/conf/logging.properties`
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/f2579a891905442906167c7d77a99198.js&quot;&gt; &lt;/script&gt;
+{% gist f2579a891905442906167c7d77a99198 %}
 
-&lt;p&gt;I have added one line to each log entry &lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.juli.AsyncFileHandler.rotatable = false&lt;/code&gt; to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.&lt;/p&gt;
+I have added one line to each log entry `org.apache.juli.AsyncFileHandler.rotatable = false` to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.
 
-&lt;h4 id=&quot;logrotate-and-compression&quot;&gt;Logrotate and Compression&lt;/h4&gt;
+#### Logrotate and Compression
 
-&lt;p&gt;create a new file at &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/logrotate.d/tomcat&lt;/code&gt;&lt;/p&gt;
+create a new file at `/etc/logrotate.d/tomcat`
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js&quot;&gt; &lt;/script&gt;
+{% gist ec043a956c9d56580217f4824392ffc3 %}
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;compress&lt;/code&gt; – compress the log files
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compresscmd&lt;/code&gt; – command used for Compression, gzip
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compressoptions&lt;/code&gt; – options for compression command, Gzip Compression level 1-9
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compressext&lt;/code&gt; – extention of compressed file&lt;/p&gt;
+`compress` – compress the log files
+`compresscmd` – command used for Compression, gzip
+`compressoptions` – options for compression command, Gzip Compression level 1-9
+`compressext` – extention of compressed file
 
-&lt;p&gt;its just going to do &lt;code class=&quot;highlighter-rouge&quot;&gt;gzip -9 filename&lt;/code&gt; , which compresses the file.&lt;/p&gt;
+its just going to do `gzip -9 filename` , which compresses the file.
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;dateext&lt;/code&gt;
-&lt;code class=&quot;highlighter-rouge&quot;&gt;dateformat -%Y-%m-%d-%s&lt;/code&gt;
-these lines add date extention to the rotated log file in the format &lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.out-2018-09-21-1537501441&lt;/code&gt;&lt;/p&gt;
+`dateext`
+`dateformat -%Y-%m-%d-%s`
+these lines add date extention to the rotated log file in the format `catalina.out-2018-09-21-1537501441`
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nomail&lt;/code&gt; tells not mail the log files&lt;/p&gt;
+`nomail` tells not mail the log files
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;copytruncate&lt;/code&gt; – copies the log file to new file and truncates the log file to zero bytes.&lt;/p&gt;
+`copytruncate` – copies the log file to new file and truncates the log file to zero bytes.
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;daily&lt;/code&gt; – rotates the log file daily&lt;/p&gt;
+`daily` – rotates the log file daily
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rotate 10&lt;/code&gt; – keep the 10 past rotated logs&lt;/p&gt;
+`rotate 10` – keep the 10 past rotated logs
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;notifempty&lt;/code&gt; – do not rotate the log if it is empty&lt;/p&gt;
+`notifempty` – do not rotate the log if it is empty
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;missingok&lt;/code&gt; – if the file is missing its ok&lt;/p&gt;
+`missingok` – if the file is missing its ok
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;create 0644 tomcat tomcat&lt;/code&gt; – create the log file with these permissions, ignored if copy truncate is used.&lt;/p&gt;
+`create 0644 tomcat tomcat` – create the log file with these permissions, ignored if copy truncate is used.
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;postrotate&lt;/code&gt; – command to run after the log rotation.&lt;/p&gt;
+`postrotate` – command to run after the log rotation.
 
-&lt;p&gt;Here we are running the a custom Bash command to encrypt and move the log files to AWS S3&lt;/p&gt;
+Here we are running the a custom Bash command to encrypt and move the log files to AWS S3
 
-&lt;h4 id=&quot;encryption-and-copying-to-aws-s3&quot;&gt;Encryption and Copying to AWS S3&lt;/h4&gt;
+#### Encryption and Copying to AWS S3
 
-&lt;p&gt;Create a Bash Shell Script &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /usr/share/encrypt&lt;/code&gt;&lt;/p&gt;
+Create a Bash Shell Script `vim /usr/share/encrypt`
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js&quot;&gt; &lt;/script&gt;
+{% gist 64dac1afc1274878e1aa9a3ce1fac6ef %}
 
-&lt;p&gt;Give it execute permissions&lt;/p&gt;
+Give it execute permissions
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x /usr/share/encrypt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+chmod +x /usr/share/encrypt
+```
 
-&lt;p&gt;This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key&lt;/p&gt;
+This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;encrypt /opt/tomcat/log /data/key
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+encrypt /opt/tomcat/log /data/key
+```
 
-&lt;p&gt;Key is needed to encrypt and decrypt the file&lt;/p&gt;
+Key is needed to encrypt and decrypt the file
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /data/key
+```shell
+cat /data/key
 Big3secret
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.&lt;/p&gt;
+Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.
 
-&lt;p&gt;For Decryption of files&lt;/p&gt;
+For Decryption of files
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gpg &lt;span class=&quot;nt&quot;&gt;--batch&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--passphrase-file&lt;/span&gt; /data/mykey &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz.gpg &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="https://shreyasmm.com/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T16:32:06+05:30</published><updated>2018-09-25T16:32:06+05:30</updated><id>https://shreyasmm.com/how-to-install-tomcat</id><content type="html" xml:base="https://shreyasmm.com/how-to-install-tomcat">&lt;p&gt;&lt;img src=&quot;/assets/images/install-tomcat.jpg&quot; alt=&quot;How to Install Tomcat&quot; /&gt;&lt;/p&gt;
+```shell
+gpg --batch --passphrase-file /data/mykey -d catalina.out-2018-09-21-1537501441.gz.gpg &gt; catalina.out-2018-09-21-1537501441.gz
+```</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="http://localhost:4000/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T16:32:06+05:30</published><updated>2018-09-25T16:32:06+05:30</updated><id>http://localhost:4000/how-to-install-tomcat</id><content type="html" xml:base="http://localhost:4000/how-to-install-tomcat">![How to Install Tomcat](/assets/images/install-tomcat.jpg)
 
-&lt;p&gt;Tomcat is web server and servlet container which is used to run java applications, i will be showing the steps to install tomcat and java in an production system. i will be installing Tomcat 9 and OpenJDK 1.8 (Java 8). Most Steps are common for Redhat and Debian based systems.&lt;/p&gt;
+Tomcat is web server and servlet container which is used to run java applications, i will be showing the steps to install tomcat and java in an production system. i will be installing Tomcat 9 and OpenJDK 1.8 (Java 8). Most Steps are common for Redhat and Debian based systems.
 
-&lt;h4 id=&quot;java-8-installation&quot;&gt;Java 8 Installation&lt;/h4&gt;
+#### Java 8 Installation
 
-&lt;p&gt;For Redhat based Distribution&lt;/p&gt;
+For Redhat based Distribution
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+yum install java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64
+```
 
-&lt;p&gt;For Debian and Ubuntu based Distribution&lt;/p&gt;
+For Debian and Ubuntu based Distribution
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;openjdk-8-jdk
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+sudo apt install openjdk-8-jdk
+```
 
-&lt;p&gt;Get the Java Installed Version&lt;/p&gt;
+Get the Java Installed Version
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-version&lt;/span&gt;
-openjdk version &lt;span class=&quot;s2&quot;&gt;&quot;1.8.0_181&quot;&lt;/span&gt;
-OpenJDK Runtime Environment &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;build 1.8.0_181-b13&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-OpenJDK 64-Bit Server VM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;build 25.181-b13, mixed mode&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+java -version
+openjdk version &quot;1.8.0_181&quot;
+OpenJDK Runtime Environment (build 1.8.0_181-b13)
+OpenJDK 64-Bit Server VM (build 25.181-b13, mixed mode)
+```
 
-&lt;p&gt;We need to set JAVA_HOME environment variable so run and get the JAVA_HOME Path&lt;/p&gt;
+We need to set JAVA_HOME environment variable so run and get the JAVA_HOME Path
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;update-alternatives &lt;span class=&quot;nt&quot;&gt;--config&lt;/span&gt; java
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+sudo update-alternatives --config java
+```
 
-&lt;p&gt;Edit file &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /etc/environment&lt;/code&gt; add JAVA_HOME environment variable&lt;/p&gt;
+Edit file `vim /etc/environment` add JAVA_HOME environment variable
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;JAVA_HOME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.el7_2.x86_64/jre&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+JAVA_HOME=&quot;/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.el7_2.x86_64/jre&quot;
+```
 
-&lt;p&gt;Logout and Login, run &lt;code class=&quot;highlighter-rouge&quot;&gt;env&lt;/code&gt;, Check for JAVA_HOME in the output.&lt;/p&gt;
+Logout and Login, run `env`, Check for JAVA_HOME in the output.
 
-&lt;h4 id=&quot;tomcat-9-installation&quot;&gt;Tomcat 9 Installation&lt;/h4&gt;
+#### Tomcat 9 Installation
 
-&lt;p&gt;Create a tomcat group&lt;/p&gt;
+Create a tomcat group
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;groupadd tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+groupadd tomcat
+```
 
-&lt;p&gt;Create a tomcat user with /opt/tomcat as its home directory&lt;/p&gt;
+Create a tomcat user with /opt/tomcat as its home directory
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /opt/tomcat
-useradd &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; /bin/false &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; tomcat &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; /opt/tomcat tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+mkdir -p /opt/tomcat
+useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+```
 
-&lt;p&gt;Change working directory and download the latest tomcat from &lt;a href=&quot;https://tomcat.apache.org&quot;&gt;tomcat website&lt;/a&gt;&lt;/p&gt;
+Change working directory and download the latest tomcat from [tomcat website](https://tomcat.apache.org)
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /opt
+```shell
+cd /opt
 wget http://mirrors.wuchna.com/apachemirror/tomcat/tomcat-9/v9.0.12/bin/apache-tomcat-9.0.12.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Extract the Tomcat archive&lt;/p&gt;
+Extract the Tomcat archive
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;tar&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-xzvf&lt;/span&gt; apache-tomcat-9.0.12.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+tar -xzvf apache-tomcat-9.0.12.tar.gz
+```
 
-&lt;p&gt;Move Contents to &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt;&lt;/p&gt;
+Move Contents to `/opt/tomcat`
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mv &lt;/span&gt;apache-tomcat/&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+mv apache-tomcat/* /opt/tomcat
+```
 
-&lt;p&gt;Change ownership and user to tomcat&lt;/p&gt;
+Change ownership and user to tomcat
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; tomcat:tomcat /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+chown -R tomcat:tomcat /opt/tomcat
+```
 
-&lt;p&gt;Create Systemd Service for Tomcat Service&lt;/p&gt;
+Create Systemd Service for Tomcat Service
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /etc/systemd/system/tomcat.service
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+vim /etc/systemd/system/tomcat.service
+```
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/a3b4986605aa6c2a0b930ac11ada8ae0.js&quot;&gt; &lt;/script&gt;
+{% gist a3b4986605aa6c2a0b930ac11ada8ae0 %}
 
-&lt;p&gt;Reload systemd manager configuration.&lt;/p&gt;
+Reload systemd manager configuration.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl daemon-reload
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+systemctl daemon-reload
+```
 
-&lt;p&gt;Start Tomcat Process.&lt;/p&gt;
+Start Tomcat Process.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl start tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+systemctl start tomcat
+```
 
-&lt;p&gt;Enable Tomcat to Start at System Boot.&lt;/p&gt;
+Enable Tomcat to Start at System Boot.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+systemctl enable tomcat
+```
 
-&lt;p&gt;Run &lt;code class=&quot;highlighter-rouge&quot;&gt;netstat -plntu&lt;/code&gt; and check port 8080 is in LISTEN State by a java program. Now open &lt;code class=&quot;highlighter-rouge&quot;&gt;http://server-ip-addres:8080&lt;/code&gt; you should see tomcat homepage&lt;/p&gt;
+Run `netstat -plntu` and check port 8080 is in LISTEN State by a java program. Now open `http://server-ip-addres:8080` you should see tomcat homepage
 
-&lt;p&gt;Configure Tomcat Manager Users&lt;/p&gt;
+Configure Tomcat Manager Users
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/8654a629ec28798e944cf36eff9985c5.js&quot;&gt; &lt;/script&gt;
+{% gist 8654a629ec28798e944cf36eff9985c5 %}
 
-&lt;p&gt;Restart Tomcat Process.&lt;/p&gt;
+Restart Tomcat Process.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl restart tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+systemctl restart tomcat
+```
 
-&lt;p&gt;Make sure all the Files in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt; belong to Tomcat user and group, Run this Command whenever you new deploy WAR in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/webapps&lt;/code&gt;&lt;/p&gt;
+Make sure all the Files in `/opt/tomcat` belong to Tomcat user and group, Run this Command whenever you new deploy WAR in `/opt/tomcat/webapps`
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; tomcat:tomcat /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="https://shreyasmm.com/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T16:32:06+05:30</published><updated>2017-03-19T16:32:06+05:30</updated><id>https://shreyasmm.com/install-nodejs-ubuntu</id><content type="html" xml:base="https://shreyasmm.com/install-nodejs-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/how-to-install-nodejs.jpg&quot; alt=&quot;How to Install Nodejs on Ubuntu&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+```shell
+chown -R tomcat:tomcat /opt/tomcat
+```</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="http://localhost:4000/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T16:32:06+05:30</published><updated>2017-03-19T16:32:06+05:30</updated><id>http://localhost:4000/install-nodejs-ubuntu</id><content type="html" xml:base="http://localhost:4000/install-nodejs-ubuntu">![How to Install Nodejs on Ubuntu](/assets/images/how-to-install-nodejs.jpg){:class=&quot;.center&quot;}
 
-&lt;p&gt;Today I am going to show How to install &lt;a href=&quot;https://nodejs.org&quot;&gt;nodejs&lt;/a&gt; on your ubuntu machine of any version, you can install multiple versions of nodejs at same time using nvm.&lt;/p&gt;
+Today I am going to show How to install [nodejs] on your ubuntu machine of any version, you can install multiple versions of nodejs at same time using nvm.
 
-&lt;h4 id=&quot;nvm--node-version-manager&quot;&gt;&lt;a href=&quot;https://github.com/creationix/nvm&quot;&gt;NVM – Node Version Manager&lt;/a&gt;&lt;/h4&gt;
+#### [NVM – Node Version Manager](https://github.com/creationix/nvm)
 
-&lt;p&gt;nvm is to node what rbenv is to ruby, nvm helps us to use multiple versions of node on project level and over all system wide level, We will be using nvm to install because ubuntu does not have latest version of node. This is the easiest method of all and to stay updated on latest release of node, lets install nvm&lt;/p&gt;
+nvm is to node what rbenv is to ruby, nvm helps us to use multiple versions of node on project level and over all system wide level, We will be using nvm to install because ubuntu does not have latest version of node. This is the easiest method of all and to stay updated on latest release of node, lets install nvm
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/creationix/nvm.git .nvm
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+git clone https://github.com/creationix/nvm.git .nvm
+```
 
-&lt;p&gt;Now we need to source the nvm directory and nvm.sh to the shell, Add below lines to your &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.bashrc&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt;, or &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.zshrc&lt;/code&gt; based on the shell you use, so that the command will be available on you login&lt;/p&gt;
+Now we need to source the nvm directory and nvm.sh to the shell, Add below lines to your `~/.bashrc`, `~/.profile`, or `~/.zshrc` based on the shell you use, so that the command will be available on you login
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;NVM_DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/.nvm&quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$NVM_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/nvm.sh&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$NVM_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/nvm.sh&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+export NVM_DIR=&quot;$HOME/.nvm&quot;
+[ -s &quot;$NVM_DIR/nvm.sh&quot; ] &amp;&amp; . &quot;$NVM_DIR/nvm.sh&quot;
+```
 
-&lt;p&gt;Now get the list of available versions of nodejs&lt;/p&gt;
+Now get the list of available versions of nodejs
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm ls-remote
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+nvm ls-remote
+```
 
-&lt;p&gt;Based on your requirement, install the node version i will go for LTS version&lt;/p&gt;
+Based on your requirement, install the node version i will go for LTS version
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;v6.10.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+nvm install v6.10.0
+```
 
-&lt;p&gt;Set this version as default&lt;/p&gt;
+Set this version as default
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm &lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;default v6.10.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+nvm alias default v6.10.0
+```
 
-&lt;p&gt;Now Nodejs is installed&lt;/p&gt;
+Now Nodejs is installed
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;node &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+node --version
+```
 
-&lt;p&gt;You also have access to npm (Node Package Manager) you can get many node packages with single command lets check its version&lt;/p&gt;
+You also have access to npm (Node Package Manager) you can get many node packages with single command lets check its version
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;npm &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+npm --version
+```
 
-&lt;p&gt;Now suppose any of your project depends on older version of node then run this in specific project directory&lt;/p&gt;
+Now suppose any of your project depends on older version of node then run this in specific project directory
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;4.8.0&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; .nvmrc
+```shell
+echo &quot;4.8.0&quot; &gt; .nvmrc
 nvm use
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="nodejs" /><category term="nvm" /><summary type="html"></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="https://shreyasmm.com/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T16:32:06+05:30</published><updated>2016-09-12T16:32:06+05:30</updated><id>https://shreyasmm.com/i-just-cleared-rhce</id><content type="html" xml:base="https://shreyasmm.com/i-just-cleared-rhce">&lt;p&gt;&lt;img src=&quot;/assets/images/rhce.jpg&quot; alt=&quot;RHCE Logo&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+```
 
-&lt;p&gt;After Two months preparation i finally cleared RHCE, on 27 Aug 2016 i received a mail saying congratulation on earning RHCE. the whole week was bliss, well i had cleared RHCSA with 300/300, RHCE with 271/300. I have done my RHCE on Red Hat Enterprise Linux 7.&lt;/p&gt;
+[nodejs]: https://nodejs.org</content><author><name>Shreyas M M</name></author><category term="nodejs" /><category term="nvm" /><summary type="html"></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="http://localhost:4000/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T16:32:06+05:30</published><updated>2016-09-12T16:32:06+05:30</updated><id>http://localhost:4000/i-just-cleared-rhce</id><content type="html" xml:base="http://localhost:4000/i-just-cleared-rhce">![RHCE Logo](/assets/images/rhce.jpg){:class=&quot;.center&quot;}
 
-&lt;p&gt;RHCSA is very easy it involves many basic Linux things RHCE is more advanced you can get more details on exams &amp;amp; course contents &lt;a href=&quot;https://www.redhat.com/en/services/certification/rhcsa&quot;&gt;RHCSA&lt;/a&gt; and &lt;a href=&quot;https://www.redhat.com/en/services/certification/rhce&quot;&gt;RHCE&lt;/a&gt;&lt;/p&gt;
+After Two months preparation i finally cleared RHCE, on 27 Aug 2016 i received a mail saying congratulation on earning RHCE. the whole week was bliss, well i had cleared RHCSA with 300/300, RHCE with 271/300. I have done my RHCE on Red Hat Enterprise Linux 7.
 
-&lt;h4 id=&quot;some-tips-on-how-to-clear-the-rhce&quot;&gt;Some tips on how to clear the RHCE&lt;/h4&gt;
+RHCSA is very easy it involves many basic Linux things RHCE is more advanced you can get more details on exams &amp; course contents [RHCSA](https://www.redhat.com/en/services/certification/rhcsa) and [RHCE](https://www.redhat.com/en/services/certification/rhce)
 
-&lt;ol&gt;
-  &lt;li&gt;Time management is very important and crucial when concentrating on RHCE.&lt;/li&gt;
-  &lt;li&gt;Even though you may know how to solve the question if you take more time in solving that problem its not worth you would have wasted more time in it instead you would have solved more small questions in it.&lt;/li&gt;
-  &lt;li&gt;Rather than working in GUI try working more in terminal you will definitely save time and use ssh when you want to execute on commands on systems.&lt;/li&gt;
-  &lt;li&gt;When practising keep note of time, you are taking to solve the problem this will help you a lot and give you a confidence exam is of 3 and half hours , you may get last half an hour for solving.&lt;/li&gt;
-  &lt;li&gt;When preparing i used books provided by redhat concentrate on concepts and solve the examples given in the books.&lt;/li&gt;
-  &lt;li&gt;Everything is in man pages, examples on important things like teaming,etc are provided in the man pages you can easily get reference from there for faster execution&lt;/li&gt;
-  &lt;li&gt;If you got struck in any question leave it go for next at the end when you have time try solving it, don’t take more than 10 mins solving a question&lt;/li&gt;
-  &lt;li&gt;Enable all the required firewall ports once, install all the packages at once in the beginning, you will definitely save a huge amount of time in this&lt;/li&gt;
-  &lt;li&gt;Restart after every entry in /etc/fstab to check you have done correctly. At the end don’t forget to restart you systems.&lt;/li&gt;
-  &lt;li&gt;Write down important things in the paper provided to you in exam it will save time when working &amp;amp; checking.&lt;/li&gt;
-&lt;/ol&gt;
+#### Some tips on how to clear the RHCE
 
-&lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;&lt;br /&gt;
+1. Time management is very important and crucial when concentrating on RHCE.
+2. Even though you may know how to solve the question if you take more time in solving that problem its not worth you would have wasted more time in it instead you would have solved more small questions in it.
+3. Rather than working in GUI try working more in terminal you will definitely save time and use ssh when you want to execute on commands on systems.
+4. When practising keep note of time, you are taking to solve the problem this will help you a lot and give you a confidence exam is of 3 and half hours , you may get last half an hour for solving.
+5. When preparing i used books provided by redhat concentrate on concepts and solve the examples given in the books.
+6. Everything is in man pages, examples on important things like teaming,etc are provided in the man pages you can easily get reference from there for faster execution
+7. If you got struck in any question leave it go for next at the end when you have time try solving it, don’t take more than 10 mins solving a question
+8. Enable all the required firewall ports once, install all the packages at once in the beginning, you will definitely save a huge amount of time in this
+9. Restart after every entry in /etc/fstab to check you have done correctly. At the end don’t forget to restart you systems.
+10. Write down important things in the paper provided to you in exam it will save time when working &amp; checking.
+
+**Important**  
 Practice as much as Possible
-Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="rhce" /><summary type="html"></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="https://shreyasmm.com/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T16:32:06+05:30</published><updated>2016-06-07T16:32:06+05:30</updated><id>https://shreyasmm.com/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="https://shreyasmm.com/setup-virtualbox-for-local-development-environment">&lt;p&gt;&lt;img src=&quot;/assets/images/virtualbox.jpg&quot; alt=&quot;Setup Virtualbox for Local Development Environment&quot; /&gt;&lt;/p&gt;
+Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.</content><author><name>Shreyas M M</name></author><category term="rhce" /><summary type="html"></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="http://localhost:4000/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T16:32:06+05:30</published><updated>2016-06-07T16:32:06+05:30</updated><id>http://localhost:4000/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="http://localhost:4000/setup-virtualbox-for-local-development-environment">![Setup Virtualbox for Local Development Environment](/assets/images/virtualbox.jpg)
 
-&lt;p&gt;Hi Today i am going show you how to setup virtualbox for local Development which will be useful when you are developing / deploying application inside the virtual machine and want to interact with it outside the virtual machine or from host machine,this is also helpful when you are developing for openstack you have installed openstack in vm and want to interact and test the api from host machine, before starting download &amp;amp; install &lt;a href=&quot;https://www.virtualbox.org&quot;&gt;Virtualbox&lt;/a&gt;.&lt;/p&gt;
+Hi Today i am going show you how to setup virtualbox for local Development which will be useful when you are developing / deploying application inside the virtual machine and want to interact with it outside the virtual machine or from host machine,this is also helpful when you are developing for openstack you have installed openstack in vm and want to interact and test the api from host machine, before starting download &amp; install [Virtualbox](https://www.virtualbox.org).
 
-&lt;p&gt;Watch Video Tutorial Over Here&lt;/p&gt;
+Watch Video Tutorial Over Here
 
-&lt;style&gt;.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }&lt;/style&gt;
-&lt;div class=&quot;embed-container&quot;&gt;    &lt;iframe title=&quot;YouTube video player&quot; width=&quot;640&quot; height=&quot;390&quot; src=&quot;//www.youtube.com/embed/qIxnx21sUDk&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
+{% youtube &quot;https://www.youtube.com/watch?v=qIxnx21sUDk&quot; %}
 
-&lt;h3 id=&quot;create-host-only-network-adapter&quot;&gt;Create Host only network adapter&lt;/h3&gt;
+### Create Host only network adapter
 
-&lt;p&gt;Click on File -&amp;gt; Preference
-&lt;img src=&quot;/assets/images/virtualbox1.png&quot; alt=&quot;Create Host only network adapter 1&quot; /&gt;&lt;/p&gt;
+Click on File -&gt; Preference
+![Create Host only network adapter 1](/assets/images/virtualbox1.png)
 
-&lt;p&gt;Choose Network, Click Host-only Networks and click on plus sign
-&lt;img src=&quot;/assets/images/virtualbox2.png&quot; alt=&quot;Create Host only network adapter 2&quot; /&gt;&lt;/p&gt;
+Choose Network, Click Host-only Networks and click on plus sign
+![Create Host only network adapter 2](/assets/images/virtualbox2.png)
 
-&lt;p&gt;Click on Settings button of vboxnet0
-&lt;img src=&quot;/assets/images/virtualbox3.png&quot; alt=&quot;Create Host only network adapter 3&quot; /&gt;&lt;/p&gt;
+Click on Settings button of vboxnet0
+![Create Host only network adapter 3](/assets/images/virtualbox3.png)
 
-&lt;p&gt;Under Adapter Tab
-&lt;img src=&quot;/assets/images/virtualbox4.png&quot; alt=&quot;Create Host only network adapter 4&quot; /&gt;&lt;/p&gt;
+Under Adapter Tab
+![Create Host only network adapter 4](/assets/images/virtualbox4.png)
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IPv4 Address 192.168.56.1
+```shell
+IPv4 Address 192.168.56.1
 IPv4 Network Mask 255.255.255.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Under DHCP Server Tab
-&lt;img src=&quot;/assets/images/virtualbox5.png&quot; alt=&quot;Create Host only network adapter 5&quot; /&gt;&lt;br /&gt;
-Check mark the “Enable Server option”&lt;/p&gt;
+Under DHCP Server Tab
+![Create Host only network adapter 5](/assets/images/virtualbox5.png)  
+Check mark the “Enable Server option”
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Server Address 192.168.56.2
+```shell
+Server Address 192.168.56.2
 Server Mask 255.255.255.0
 Lower Address Bound 192.168.56.3
 Upper Address Bound 192.168.56.240
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;h4 id=&quot;add-host-only-adapter-to-virtual-machine-as-network-adapter-2&quot;&gt;Add Host only adapter to virtual machine as Network Adapter 2&lt;/h4&gt;
+#### Add Host only adapter to virtual machine as Network Adapter 2
 
-&lt;p&gt;Right Click on the vm and click on settings
-&lt;img src=&quot;/assets/images/virtualbox6.png&quot; alt=&quot;Create Host only network adapter 6&quot; /&gt;&lt;/p&gt;
+Right Click on the vm and click on settings
+![Create Host only network adapter 6](/assets/images/virtualbox6.png)
 
-&lt;p&gt;Choose Network , Under Adapter 2&lt;br /&gt;
-Check Enable Network Adapter&lt;br /&gt;
-Attached to: Host-only Adapter&lt;br /&gt;
+Choose Network , Under Adapter 2  
+Check Enable Network Adapter  
+Attached to: Host-only Adapter  
 Name: vboxnet0
-&lt;img src=&quot;/assets/images/virtualbox7.png&quot; alt=&quot;Create Host only network adapter 7&quot; /&gt;&lt;/p&gt;
+![Create Host only network adapter 7](/assets/images/virtualbox7.png)
 
-&lt;p&gt;Then boot the vm and run &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo vim /etc/network/interfaces&lt;/code&gt;
-Add These two lines at end&lt;/p&gt;
+Then boot the vm and run `sudo vim /etc/network/interfaces`
+Add These two lines at end
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;auto enp0s8
+```shell
+auto enp0s8
 iface enp0s8 inet dhcp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Save the file and reboot the vm&lt;/p&gt;
+Save the file and reboot the vm
 
-&lt;p&gt;Full Contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/network/interfaces&lt;/code&gt; file&lt;/p&gt;
+Full Contents of `/etc/network/interfaces` file
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# The loopback network interface&lt;/span&gt;
+```shell
+# The loopback network interface
 auto lo
 iface lo inet loopback
 
-&lt;span class=&quot;c&quot;&gt;# The primary network interface&lt;/span&gt;
+# The primary network interface
 auto enp0s3
 iface enp0s3 inet dhcp
 
 auto enp0s8
 iface enp0s8 inet dhcp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Once the vm is booted find the ip address given by hostonly adapter by running &lt;code class=&quot;highlighter-rouge&quot;&gt;ip a&lt;/code&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;enp0s8&lt;/code&gt;  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run &lt;code class=&quot;highlighter-rouge&quot;&gt;ping [ip address of vm]&lt;/code&gt;, install webserver on vm open it on host machine.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="https://shreyasmm.com/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T16:32:06+05:30</published><updated>2016-03-09T16:32:06+05:30</updated><id>https://shreyasmm.com/install-django-on-ubuntu</id><content type="html" xml:base="https://shreyasmm.com/install-django-on-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/installing-django-on-ubuntu.jpg&quot; alt=&quot;Installing Django on Ubuntu&quot; /&gt;&lt;/p&gt;
+Once the vm is booted find the ip address given by hostonly adapter by running `ip a` of `enp0s8`  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run `ping [ip address of vm]`, install webserver on vm open it on host machine.</content><author><name>Shreyas M M</name></author><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="http://localhost:4000/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T16:32:06+05:30</published><updated>2016-03-09T16:32:06+05:30</updated><id>http://localhost:4000/install-django-on-ubuntu</id><content type="html" xml:base="http://localhost:4000/install-django-on-ubuntu">![Installing Django on Ubuntu](/assets/images/installing-django-on-ubuntu.jpg)
 
-&lt;p&gt;Today i am going to show how to setup or install &lt;a href=&quot;https://www.djangoproject.com&quot;&gt;Django&lt;/a&gt; environment on Ubuntu. I will be concentrating only on python 3 version. Django is web application framework written in python, It Uses MVT (Models, Views, Templates) Concept .&lt;/p&gt;
+Today i am going to show how to setup or install [Django](https://www.djangoproject.com) environment on Ubuntu. I will be concentrating only on python 3 version. Django is web application framework written in python, It Uses MVT (Models, Views, Templates) Concept .
 
-&lt;p&gt;We will be installing django in an isolated environment but why? simple because we do not want django packages to mess with os python libraries, we will be using pip to install packages and virtualenv to create virtual environments.pip is a package management system used to install and manage software packages written in Python. Now open your terminal and follow this commands&lt;/p&gt;
+We will be installing django in an isolated environment but why? simple because we do not want django packages to mess with os python libraries, we will be using pip to install packages and virtualenv to create virtual environments.pip is a package management system used to install and manage software packages written in Python. Now open your terminal and follow this commands
 
-&lt;p&gt;Install python3 Pip&lt;/p&gt;
+Install python3 Pip
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;python3-pip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+sudo apt-get install python3-pip
+```
 
-&lt;p&gt;Install Virtualenv&lt;/p&gt;
+Install Virtualenv
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip3 &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;virtualenv
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+sudo pip3 install virtualenv
+```
 
-&lt;p&gt;Create new directory for your project&lt;/p&gt;
+Create new directory for your project
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; Code/Django/myapp
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;Code/Django/myapp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+mkdir -p Code/Django/myapp
+cd Code/Django/myapp
+```
 
-&lt;p&gt;Create new Virtual Environment we will call it py3&lt;/p&gt;
+Create new Virtual Environment we will call it py3
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtualenv py3
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+virtualenv py3
+```
 
-&lt;p&gt;Once you run above command new directory py3 will be created. Now We need to activate our new py3 environment&lt;/p&gt;
+Once you run above command new directory py3 will be created. Now We need to activate our new py3 environment
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;py3/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+source py3/bin/activate
+```
 
-&lt;p&gt;your prompt will be changed to &lt;code class=&quot;highlighter-rouge&quot;&gt;(py3) Code/Django/myapp&lt;/code&gt;&lt;/p&gt;
+your prompt will be changed to `(py3) Code/Django/myapp`
 
-&lt;p&gt;Now Install Django. Notice we are not running pip3 command, we will just  run pip inside virtualenv&lt;/p&gt;
+Now Install Django. Notice we are not running pip3 command, we will just  run pip inside virtualenv
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;django
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+pip install django
+```
 
-&lt;p&gt;Once Django is installed, you can check the version by&lt;/p&gt;
+Once Django is installed, you can check the version by
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;django-admin &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
+```shell
+django-admin --version
 1.9.2
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```
 
-&lt;p&gt;Lets start new project call makeinindia&lt;/p&gt;
+Lets start new project call makeinindia
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;django-admin startproject makeinindia
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;makeinindia
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+django-admin startproject makeinindia
+cd makeinindia
+```
 
-&lt;p&gt;Lets start new app blog&lt;/p&gt;
+Lets start new app blog
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python manage.py startapp blog
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+python manage.py startapp blog
+```
 
-&lt;p&gt;Now we will start the server&lt;/p&gt;
+Now we will start the server
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python manage.py runserver
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+python manage.py runserver
+```
 
-&lt;p&gt;Finally done, Whenever you want to leave the virtual environment just run to &lt;code class=&quot;highlighter-rouge&quot;&gt;deactivate&lt;/code&gt;&lt;/p&gt;
+Finally done, Whenever you want to leave the virtual environment just run to `deactivate`
 
-&lt;p&gt;Dont forget  to run this command Every time you want to work with your Django app&lt;/p&gt;
+Dont forget  to run this command Every time you want to work with your Django app
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;Code/Django/myapp
-&lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;py3/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="django" /><category term="ubuntu" /><summary type="html"></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="https://shreyasmm.com/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T16:32:06+05:30</published><updated>2015-12-10T16:32:06+05:30</updated><id>https://shreyasmm.com/device-drivers-linux</id><content type="html" xml:base="https://shreyasmm.com/device-drivers-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/device-drivers.jpg&quot; alt=&quot;Device Drivers in Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+```shell
+cd Code/Django/myapp
+source py3/bin/activate
+```</content><author><name>Shreyas M M</name></author><category term="django" /><category term="ubuntu" /><summary type="html"></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="http://localhost:4000/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T16:32:06+05:30</published><updated>2015-12-10T16:32:06+05:30</updated><id>http://localhost:4000/device-drivers-linux</id><content type="html" xml:base="http://localhost:4000/device-drivers-linux">![Device Drivers in Linux](/assets/images/device-drivers.jpg){:class=&quot;.center&quot;}
 
-&lt;p&gt;This is my Advance Operating System Assignment. I will show how to Compile Linux Kernel from Source,You can download Linux Kernel From &lt;a href=&quot;https://www.kernel.org&quot;&gt;Here&lt;/a&gt;.&lt;/p&gt;
+This is my Advance Operating System Assignment. I will show how to Compile Linux Kernel from Source,You can download Linux Kernel From [Here](https://www.kernel.org).
 
-&lt;p&gt;https://www.slideshare.net/MMShreyas/device-drivers-in-linux&lt;/p&gt;
+https://www.slideshare.net/MMShreyas/device-drivers-in-linux
 
-&lt;p&gt;I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="linux" /><category term="presentations" /><summary type="html"></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T16:32:06+05:30</published><updated>2015-12-05T16:32:06+05:30</updated><id>https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes">&lt;p&gt;&lt;img src=&quot;/assets/images/containers-cloud-lxc-docker-kubernetes.jpg&quot; alt=&quot;Containers and Cloud: From LXC to Docker to Kubernetes&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.</content><author><name>Shreyas M M</name></author><category term="linux" /><category term="presentations" /><summary type="html"></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="http://localhost:4000/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T16:32:06+05:30</published><updated>2015-12-05T16:32:06+05:30</updated><id>http://localhost:4000/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="http://localhost:4000/containers-cloud-lxc-docker-kubernetes">![Containers and Cloud: From LXC to Docker to Kubernetes](/assets/images/containers-cloud-lxc-docker-kubernetes.jpg){:class=&quot;.center&quot;}
 
-&lt;p&gt;Well this is December a month full of Exams, Assignments, Seminars.This is my Seminar Topic Containers and Cloud: From LXC to Docker to Kubernetes, it speaks about how present Cloud system is moving from Hypervisors to Docker &amp;amp; Kubernetes.&lt;/p&gt;
+Well this is December a month full of Exams, Assignments, Seminars.This is my Seminar Topic Containers and Cloud: From LXC to Docker to Kubernetes, it speaks about how present Cloud system is moving from Hypervisors to Docker &amp; Kubernetes.
 
-&lt;p&gt;https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="docker" /><summary type="html"></summary></entry><entry><title type="html">AVL Trees Implementation in Python</title><link href="https://shreyasmm.com/avl-trees-implementation-in-python" rel="alternate" type="text/html" title="AVL Trees Implementation in Python" /><published>2015-11-16T16:32:06+05:30</published><updated>2015-11-16T16:32:06+05:30</updated><id>https://shreyasmm.com/avl-trees-implementation-in-python</id><content type="html" xml:base="https://shreyasmm.com/avl-trees-implementation-in-python">&lt;p&gt;&lt;img src=&quot;/assets/images/py-avl.jpg&quot; alt=&quot;AVL Trees Implementation in Python&quot; /&gt;&lt;/p&gt;
+https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="docker" /><summary type="html"></summary></entry><entry><title type="html">AVL Trees Implementation in Python</title><link href="http://localhost:4000/avl-trees-implementation-in-python" rel="alternate" type="text/html" title="AVL Trees Implementation in Python" /><published>2015-11-16T16:32:06+05:30</published><updated>2015-11-16T16:32:06+05:30</updated><id>http://localhost:4000/avl-trees-implementation-in-python</id><content type="html" xml:base="http://localhost:4000/avl-trees-implementation-in-python">![AVL Trees Implementation in Python](/assets/images/py-avl.jpg)
 
-&lt;p&gt;I had an Assignment Recently in Advance Data Structures Course to implement AVL Trees. So Here is the source code for it. I am not going to explain what AVL Trees is, since there are many better tutorials out there.
-Download from Here or Clone the GitHub Repository enter below command&lt;/p&gt;
+I had an Assignment Recently in Advance Data Structures Course to implement AVL Trees. So Here is the source code for it. I am not going to explain what AVL Trees is, since there are many better tutorials out there.
+Download from Here or Clone the GitHub Repository enter below command
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/shreyasmm/AVL-Trees
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+git clone https://github.com/shreyasmm/AVL-Trees
+```
 
-&lt;p&gt;You need to have python installed in your windows system, Linux Systems will have by default
+You need to have python installed in your windows system, Linux Systems will have by default
 its better to have a IDE for editing python code like PyCharms (Optional)
-Execute Command in Terminal&lt;/p&gt;
+Execute Command in Terminal
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python avl.py
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+python avl.py
+```
 
-&lt;p&gt;Output
-&lt;img src=&quot;/assets/images/py-avl-output1.jpg&quot; alt=&quot;AVL Trees Output 1&quot; /&gt;
-&lt;img src=&quot;/assets/images/py-avl-output2.jpg&quot; alt=&quot;AVL Trees Output 2&quot; /&gt;&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="avl-trees" /><category term="python" /><summary type="html"></summary></entry><entry><title type="html">Create a Ramdisk in Ubuntu Linux</title><link href="https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux" rel="alternate" type="text/html" title="Create a Ramdisk in Ubuntu Linux" /><published>2015-10-22T16:32:06+05:30</published><updated>2015-10-22T16:32:06+05:30</updated><id>https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux</id><content type="html" xml:base="https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/ram-disk-in-ubuntu.jpg&quot; alt=&quot;Create a Ramdisk in Ubuntu Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+Output
+![AVL Trees Output 1](/assets/images/py-avl-output1.jpg)
+![AVL Trees Output 2](/assets/images/py-avl-output2.jpg)</content><author><name>Shreyas M M</name></author><category term="avl-trees" /><category term="python" /><summary type="html"></summary></entry><entry><title type="html">Create a Ramdisk in Ubuntu Linux</title><link href="http://localhost:4000/create-a-ramdisk-in-ubuntu-linux" rel="alternate" type="text/html" title="Create a Ramdisk in Ubuntu Linux" /><published>2015-10-22T16:32:06+05:30</published><updated>2015-10-22T16:32:06+05:30</updated><id>http://localhost:4000/create-a-ramdisk-in-ubuntu-linux</id><content type="html" xml:base="http://localhost:4000/create-a-ramdisk-in-ubuntu-linux">![Create a Ramdisk in Ubuntu Linux](/assets/images/ram-disk-in-ubuntu.jpg){:class=&quot;.center&quot;}
 
-&lt;p&gt;Today i am going to show you how to create a ramdisk in Ubuntu, but the same applies for other Linux Distributions also. Before going to point i want to make clear why you need ramdisk in first place.&lt;/p&gt;
+Today i am going to show you how to create a ramdisk in Ubuntu, but the same applies for other Linux Distributions also. Before going to point i want to make clear why you need ramdisk in first place.
 
-&lt;p&gt;ramdisk is useful in many places like if you are watching an HD movie from harddisk. The disk always keeps up spinning, which may reduce the life of the hard disk, other place is in software applications, if you move ide like Android Studio or Intellij IDEA to ramdisk they offer more performance&lt;/p&gt;
+ramdisk is useful in many places like if you are watching an HD movie from harddisk. The disk always keeps up spinning, which may reduce the life of the hard disk, other place is in software applications, if you move ide like Android Studio or Intellij IDEA to ramdisk they offer more performance
 
-&lt;p&gt;In order to get full performance you need to have more ram like 8 GB. its not like if you have less ram you cannot create ramdisk, you can create but you cannot load big files to ram.&lt;/p&gt;
+In order to get full performance you need to have more ram like 8 GB. its not like if you have less ram you cannot create ramdisk, you can create but you cannot load big files to ram.
 
-&lt;p&gt;Create a directory first&lt;/p&gt;
+Create a directory first
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /home/shrey/Others/Ramdisk
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+mkdir -p /home/shrey/Others/Ramdisk
+```
 
-&lt;p&gt;we use mount command -t specifies type is tmpfs is temporary filesystem source is tmpfs destination is my home directory and the size is 2GB.&lt;/p&gt;
+we use mount command -t specifies type is tmpfs is temporary filesystem source is tmpfs destination is my home directory and the size is 2GB.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;mount &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; tmpfs tmpfs /home/shrey/Others/Ramdisk &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2048m
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+sudo mount -t tmpfs tmpfs /home/shrey/Others/Ramdisk -o size=2048m
+```
 
-&lt;p&gt;Note the destination directory should be created first then run this command, Ramdisk are volatile after you shutdown the data will be lost, so be careful do not copy original files to disk as they will lost after shutdown, crash, reboot.&lt;/p&gt;
+Note the destination directory should be created first then run this command, Ramdisk are volatile after you shutdown the data will be lost, so be careful do not copy original files to disk as they will lost after shutdown, crash, reboot.
 
-&lt;p&gt;To easily use this command we create an alias&lt;/p&gt;
+To easily use this command we create an alias
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ramdisk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo mount -t tmpfs tmpfs /home/shrey/Others/Ramdisk -o size=2048m&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+alias ramdisk=&quot;sudo mount -t tmpfs tmpfs /home/shrey/Others/Ramdisk -o size=2048m&quot;
+```
 
-&lt;p&gt;paste this in your .bashrc or .zshrc or .alias file. Restart the terminal and run ramdisk command, ramdisk will be created. Go the destination directory copy a movie file over there mine is in &lt;code class=&quot;highlighter-rouge&quot;&gt;/home/shrey/Others/Ramdisk&lt;/code&gt; play the movie from there. You can see the movie is loaded from ram so it will be faster. and no hard disk is used here to play the movie.&lt;/p&gt;
+paste this in your .bashrc or .zshrc or .alias file. Restart the terminal and run ramdisk command, ramdisk will be created. Go the destination directory copy a movie file over there mine is in `/home/shrey/Others/Ramdisk` play the movie from there. You can see the movie is loaded from ram so it will be faster. and no hard disk is used here to play the movie.
 
-&lt;p&gt;If you want ramdisk to be created at every startup or reboot edit &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /etc/fstab&lt;/code&gt; Add bellow line at the end of the file.&lt;/p&gt;
+If you want ramdisk to be created at every startup or reboot edit `vim /etc/fstab` Add bellow line at the end of the file.
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;tmpfs /home/shrey/Others/Ramdisk tmpfs rw,size&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2048M 0 0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+```shell
+tmpfs /home/shrey/Others/Ramdisk tmpfs rw,size=2048M 0 0
+```
 
-&lt;p&gt;Now you don need to run the command ramdisk every time.&lt;/p&gt;
+Now you don need to run the command ramdisk every time.
 
-&lt;p&gt;I mostly use ram disk for watching movies for 2+ hours best use of ramdisk is loading the static files like html, js, fonts &amp;amp; images in ramdisk it could increase the server response time and disk performance of web server .&lt;/p&gt;
+I mostly use ram disk for watching movies for 2+ hours best use of ramdisk is loading the static files like html, js, fonts &amp; images in ramdisk it could increase the server response time and disk performance of web server .
 
-&lt;p&gt;For ease of access in Ubuntu Desktop open the folder Ramdisk in Files app or Nautilus in menu Bookmarks -&amp;gt; Bookmark this Location you will get the directory in left sidebar.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="ubuntu" /><summary type="html"></summary></entry></feed>
+For ease of access in Ubuntu Desktop open the folder Ramdisk in Files app or Nautilus in menu Bookmarks -&gt; Bookmark this Location you will get the directory in left sidebar.</content><author><name>Shreyas M M</name></author><category term="ubuntu" /><summary type="html"></summary></entry></feed>
