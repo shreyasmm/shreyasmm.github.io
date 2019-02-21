@@ -10,14 +10,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Tomcat server log rotation and encrypting logs, copying logs to AWS S3.">
   <meta name="author" content="Shreyas MM" />
-  <link rel="canonical" href="http://localhost:4000/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">
-  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="http://localhost:4000/feed/"/>
+  <link rel="canonical" href="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">
+  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="https://shreyasmm.com/feed/"/>
   
   <!-- Opengraph Tags-->
   <meta property="og:locale" content="en_US" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Shreyas MM" />
-  <meta property="og:url" content="http://localhost:4000/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" />
+  <meta property="og:url" content="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" />
   <meta property="og:title" content="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" />
   <meta property="og:description" content="Tomcat server log rotation and encrypting logs, copying logs to AWS S3." />
 
@@ -957,7 +957,7 @@ Licensed MIT
             
           
             
-            <li><a class="page-link" href="/_pages/archives.html">Archives</a></li>
+            <li><a class="page-link" href="/archives/">Archives</a></li>
             
           
             
@@ -988,7 +988,9 @@ Licensed MIT
 
 <p>Add this lines to <code class="highlighter-rouge">/opt/tomcat/conf/logging.properties</code></p>
 
-<p>true<script src="https://gist.github.com/f2579a891905442906167c7d77a99198.js"> </script></p>
+<noscript><pre>400: Invalid request
+</pre></noscript>
+<script src="https://gist.github.com/f2579a891905442906167c7d77a99198.js"> </script>
 
 <p>I have added one line to each log entry <code class="highlighter-rouge">org.apache.juli.AsyncFileHandler.rotatable = false</code> to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.</p>
 
@@ -996,7 +998,9 @@ Licensed MIT
 
 <p>create a new file at <code class="highlighter-rouge">/etc/logrotate.d/tomcat</code></p>
 
-<p>true<script src="https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js"> </script></p>
+<noscript><pre>400: Invalid request
+</pre></noscript>
+<script src="https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js"> </script>
 
 <p><code class="highlighter-rouge">compress</code> – compress the log files
 <code class="highlighter-rouge">compresscmd</code> – command used for Compression, gzip
@@ -1031,7 +1035,9 @@ these lines add date extention to the rotated log file in the format <code class
 
 <p>Create a Bash Shell Script <code class="highlighter-rouge">vim /usr/share/encrypt</code></p>
 
-<p>true<script src="https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js"> </script></p>
+<noscript><pre>400: Invalid request
+</pre></noscript>
+<script src="https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js"> </script>
 
 <p>Give it execute permissions</p>
 
