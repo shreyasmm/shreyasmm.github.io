@@ -1,3 +1,4 @@
+@import url(https://fonts.googleapis.com/css?family=Google+Sans:300,400,500,700);
 /* 320px  */
 /* 600px  */
 /* 900px  */
@@ -35,7 +36,7 @@ body:after {
 /* 2.986 */
 /* 3.583 */
 body {
-  font-family: Overpass, system, sans-serif;
+  font-family: "Google Sans", system, sans-serif;
   font-size: 1em;
   line-height: 1.728; }
 
@@ -84,7 +85,7 @@ h1, .h1,
 h2, .h2,
 h3, .h3,
 label, legend {
-  font-family: Overpass, system, sans-serif; }
+  font-family: "Google Sans", system, sans-serif; }
 
 h1, .h1,
 h2, .h2,
