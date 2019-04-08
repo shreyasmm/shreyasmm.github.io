@@ -10,14 +10,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="My Everyday Discoveries">
   <meta name="author" content="Shreyas MM" />
-  <link rel="canonical" href="https://shreyasmm.com/">
-  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="https://shreyasmm.com/feed/"/>
+  <link rel="canonical" href="https://www.shreyasmm.com/">
+  <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="https://www.shreyasmm.com/feed/"/>
   
   <!-- Opengraph Tags-->
   <meta property="og:locale" content="en_US" />
   <meta property="og:type" content="article" />
   <meta property="og:site_name" content="Shreyas MM" />
-  <meta property="og:url" content="https://shreyasmm.com/" />
+  <meta property="og:url" content="https://www.shreyasmm.com/" />
   <meta property="og:title" content="Shreyas M M" />
   <meta property="og:description" content="My Everyday Discoveries" />
 
@@ -966,6 +966,10 @@ Licensed MIT
           
             
           
+            
+            <li><a class="page-link" href="/publications">Publications</a></li>
+            
+          
         </ul>
       </nav>
   </div>
@@ -977,91 +981,99 @@ Licensed MIT
       
 <div class="wrapper">
   <article class="post">
-    <h1 class="post-title">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</h1>
-    <p class="post-meta">26/09/2018</p>
-    <p><img src="/assets/images/tomcat-log-rotation.jpg" alt="Tomcat Log Rotation" /></p>
+    <h1 class="post-title">Securing Web Applications with AWS ALB Authentication and OKTA OIDC</h1>
+    <p class="post-meta">08/04/2019</p>
+    <p><img src="/assets/images/okta.jpg" alt="AWS ELB Authentication with OKTA" />
+<strong>Contents</strong></p>
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#assumptions">Assumptions</a></li>
+  <li><a href="#configuring-okta">Configuring OKTA</a></li>
+  <li><a href="#configuring-aws-application-load-balancer">Configuring AWS Application Load Balancer</a></li>
+  <li><a href="#shortcomings">Shortcomings</a></li>
+  <li><a href="#resources">Resources</a></li>
+</ul>
 
-<p>In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.</p>
+<h2 id="introduction">Introduction</h2>
 
-<p>In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in <code class="highlighter-rouge">/etc/logrotate.d</code></p>
+<p>AWS Elastic Load Balancer Service has introduced Builtin Authentication which supports any third party OIDC (<a href="https://openid.net/connect/">Open ID Connect</a>) Identity provider or <a href="https://aws.amazon.com/cognito/">AWS Cognito</a>.</p>
 
-<p>I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from <a href="/">here</a>. Tomcat rotates the logs by itself in a default setup. which is configured in <code class="highlighter-rouge">/opt/tomcat/conf/logging.properties</code> file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.</p>
+<p>Many organizations use centralized identity servers like <a href="https://www.okta.com">OKTA</a>, <a href="https://azure.microsoft.com/en-in/services/active-directory/">Azure Active Directory</a>, <a href="https://auth0.com/">Auth0</a>, and <a href="https://www.onelogin.com/">Onelogin</a> to secure there complete cloud solutions.</p>
 
-<p>Add this lines to <code class="highlighter-rouge">/opt/tomcat/conf/logging.properties</code></p>
+<p>Now with this support we can use same OIDC identity providers with less effort to provide Authentication to Web Apps and Web Pages which are behind the AWS ALB (Applcation Loadbalancer). It also helps to take off the load of authentication of users form web application. In this article i will be showing how we can use AWS ALB builtin authentication with OKTA OIDC.</p>
 
-<noscript><pre>400: Invalid request
-</pre></noscript>
-<script src="https://gist.github.com/f2579a891905442906167c7d77a99198.js"> </script>
+<h2 id="assumptions">Assumptions</h2>
 
-<p>I have added one line to each log entry <code class="highlighter-rouge">org.apache.juli.AsyncFileHandler.rotatable = false</code> to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.</p>
+<p>OKTA Organization URL → <code class="highlighter-rouge">https://dev-267174.okta.com</code><br />
+ALB Endpoint → <code class="highlighter-rouge">https://www.alb-okta-test.com</code><br />
+Architecture<br />
+<img src="/assets/images/okta1.jpg" alt="AWS OKTA Arch" /></p>
 
-<h4 id="logrotate-and-compression">Logrotate and Compression</h4>
+<h2 id="configuring-okta">Configuring OKTA</h2>
 
-<p>create a new file at <code class="highlighter-rouge">/etc/logrotate.d/tomcat</code></p>
+<p>Create a new OKTA Developer Account. We will be creating a new Client Application from Applications → Add Applications. Select the Application Platform as WEB
+<img src="/assets/images/okta2.png" alt="AWS ELB Authentication with OKTA" /></p>
 
-<noscript><pre>400: Invalid request
-</pre></noscript>
-<script src="https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js"> </script>
+<p>Give Application label → Any Name<br />
+Login redirect URIs → <code class="highlighter-rouge">https://www.alb-okta-test.com/oauth2/idpresponse</code><br />
+Initiate login URI → <code class="highlighter-rouge">https://www.alb-okta-test.com</code><br />
+Group assignments → Everyone or Any Specific Group<br />
+Grant type allowed → Authorization Code only
+Once Created Note down the Client Credentials → Client ID &amp; Client Secret</p>
 
-<p><code class="highlighter-rouge">compress</code> – compress the log files
-<code class="highlighter-rouge">compresscmd</code> – command used for Compression, gzip
-<code class="highlighter-rouge">compressoptions</code> – options for compression command, Gzip Compression level 1-9
-<code class="highlighter-rouge">compressext</code> – extention of compressed file</p>
+<p><img src="/assets/images/okta3.png" alt="AWS ELB Authentication with OKTA" />
+And in Assignments make sure you have atleast one User assigned to login.</p>
 
-<p>its just going to do <code class="highlighter-rouge">gzip -9 filename</code> , which compresses the file.</p>
+<p>Goto API → Authorization Servers, Get your Issuer URI from there.<br />
+<img src="/assets/images/okta4.png" alt="AWS ELB Authentication with OKTA" /></p>
 
-<p><code class="highlighter-rouge">dateext</code>
-<code class="highlighter-rouge">dateformat -%Y-%m-%d-%s</code>
-these lines add date extention to the rotated log file in the format <code class="highlighter-rouge">catalina.out-2018-09-21-1537501441</code></p>
+<p><strong>Now all your Endpoints will be</strong><br />
+Issuer Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default</code><br />
+Authorization Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/authorize</code><br />
+Token Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/token</code><br />
+User Info Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/userinfo</code><br />
+Client ID &amp; Client Secret → Get from the OKTA Client Application.</p>
 
-<p><code class="highlighter-rouge">nomail</code> tells not mail the log files</p>
+<h2 id="configuring-aws-application-load-balancer">Configuring AWS Application Load Balancer</h2>
 
-<p><code class="highlighter-rouge">copytruncate</code> – copies the log file to new file and truncates the log file to zero bytes.</p>
+<p>Assuming that Load Balancers, Target Groups and EC2 Instances have properly configured. Goto Amazon EC2 → Load Balancers → Select required ALB → Click on Listeners TAB → Select HTTPS → Click on Edit. You will be Redirected to Listener Pages
+<img src="/assets/images/okta5.png" alt="AWS ELB Authentication with OKTA" />
+Click on Add Action → Select Authenticate.<br />
+<strong>Under Authenticate</strong><br />
+Authenticate → OIDC<br />
+Issuer Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default</code><br />
+Authorization Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/authorize</code><br />
+Token Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/token</code><br />
+User Info Endpoint → <code class="highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/userinfo</code><br />
+Client ID &amp; Client Secret → Get it from your OKTA Client Application.<br />
+<img src="/assets/images/okta6.png" alt="AWS ELB Authentication with OKTA" />
+<strong>Under Advanced Settings</strong><br />
+Session cookie name → <code class="highlighter-rouge">AWSELBAuthSessionCookie</code><br />
+Session timeout → <code class="highlighter-rouge">300</code><br />
+Scope → <code class="highlighter-rouge">openid profile</code><br />
+Action on unauthenticated request → <code class="highlighter-rouge">Authenticate (client reattempt)</code><br />
+<img src="/assets/images/okta7.png" alt="AWS ELB Authentication with OKTA" />
+Now Click Save or Update. Visit <code class="highlighter-rouge">https://www.alb-okta-test.com</code> or your Load Balancer URL which will be redirected to OKTA Sign in Page
+<img src="/assets/images/okta8.png" alt="AWS ELB Authentication with OKTA" />
+Once Logged in You will able to view the site and AWS ALB Session Cookie is Set.
+<img src="/assets/images/okta9.png" alt="AWS ELB Authentication with OKTA" /></p>
 
-<p><code class="highlighter-rouge">daily</code> – rotates the log file daily</p>
+<h2 id="shortcomings">Shortcomings</h2>
 
-<p><code class="highlighter-rouge">rotate 10</code> – keep the 10 past rotated logs</p>
+<p>When an application needs to log out an authenticated user, it should set the expiration time of the authentication session cookie (AWSELBAuthSessionCookie) to -1 and redirect the client to the IdP (OKTA ) logout endpoint which is</p>
 
-<p><code class="highlighter-rouge">notifempty</code> – do not rotate the log if it is empty</p>
+<p><code class="highlighter-rouge">GET https://dev-267174.okta.com/oauth2/default/v1/logout?id_token_hint=${id_token}</code></p>
 
-<p><code class="highlighter-rouge">missingok</code> – if the file is missing its ok</p>
+<p>Since we do not have the id_token to make this request because the id_token was give to AWS ALB, we cannot see this in browser also, AWS ALB internally gets the id_token and sets the session cookie.
+One way to overcome this is set short session timeout like 300 seconds in loadbalancer configuration. <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html#authentication-logout-timeout">Refer here</a></p>
 
-<p><code class="highlighter-rouge">create 0644 tomcat tomcat</code> – create the log file with these permissions, ignored if copy truncate is used.</p>
+<h2 id="resources">Resources</h2>
 
-<p><code class="highlighter-rouge">postrotate</code> – command to run after the log rotation.</p>
-
-<p>Here we are running the a custom Bash command to encrypt and move the log files to AWS S3</p>
-
-<h4 id="encryption-and-copying-to-aws-s3">Encryption and Copying to AWS S3</h4>
-
-<p>Create a Bash Shell Script <code class="highlighter-rouge">vim /usr/share/encrypt</code></p>
-
-<noscript><pre>400: Invalid request
-</pre></noscript>
-<script src="https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js"> </script>
-
-<p>Give it execute permissions</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x /usr/share/encrypt
-</code></pre></div></div>
-
-<p>This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>encrypt /opt/tomcat/log /data/key
-</code></pre></div></div>
-
-<p>Key is needed to encrypt and decrypt the file</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /data/key
-Big3secret
-</code></pre></div></div>
-
-<p>Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.</p>
-
-<p>For Decryption of files</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg <span class="nt">--batch</span> <span class="nt">--passphrase-file</span> /data/mykey <span class="nt">-d</span> catalina.out-2018-09-21-1537501441.gz.gpg <span class="o">&gt;</span> catalina.out-2018-09-21-1537501441.gz
-</code></pre></div></div>
+<ol>
+  <li><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html</a></li>
+  <li><a href="https://connect2id.com/learn/openid-connect">https://connect2id.com/learn/openid-connect</a></li>
+  <li><a href="https://developer.okta.com/docs/api/resources/oidc">https://developer.okta.com/docs/api/resources/oidc</a></li>
+</ol>
 
   </article>
 </div>

@@ -1,4 +1,94 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://shreyasmm.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://shreyasmm.com/" rel="alternate" type="text/html" /><updated>2019-02-22T01:31:44+05:30</updated><id>https://shreyasmm.com/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T16:32:06+05:30</published><updated>2018-09-26T16:32:06+05:30</updated><id>https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="https://shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">&lt;p&gt;&lt;img src=&quot;/assets/images/tomcat-log-rotation.jpg&quot; alt=&quot;Tomcat Log Rotation&quot; /&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://www.shreyasmm.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.shreyasmm.com/" rel="alternate" type="text/html" /><updated>2019-04-08T15:04:51+05:30</updated><id>https://www.shreyasmm.com/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Securing Web Applications with AWS ALB Authentication and OKTA OIDC</title><link href="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta" rel="alternate" type="text/html" title="Securing Web Applications with AWS ALB Authentication and OKTA OIDC" /><published>2019-04-08T10:32:06+05:30</published><updated>2019-04-08T10:32:06+05:30</updated><id>https://www.shreyasmm.com/securing-web-applications-with-aws-elb</id><content type="html" xml:base="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta">&lt;p&gt;&lt;img src=&quot;/assets/images/okta.jpg&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+&lt;strong&gt;Contents&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#assumptions&quot;&gt;Assumptions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#configuring-okta&quot;&gt;Configuring OKTA&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#configuring-aws-application-load-balancer&quot;&gt;Configuring AWS Application Load Balancer&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#shortcomings&quot;&gt;Shortcomings&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#resources&quot;&gt;Resources&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;AWS Elastic Load Balancer Service has introduced Builtin Authentication which supports any third party OIDC (&lt;a href=&quot;https://openid.net/connect/&quot;&gt;Open ID Connect&lt;/a&gt;) Identity provider or &lt;a href=&quot;https://aws.amazon.com/cognito/&quot;&gt;AWS Cognito&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Many organizations use centralized identity servers like &lt;a href=&quot;https://www.okta.com&quot;&gt;OKTA&lt;/a&gt;, &lt;a href=&quot;https://azure.microsoft.com/en-in/services/active-directory/&quot;&gt;Azure Active Directory&lt;/a&gt;, &lt;a href=&quot;https://auth0.com/&quot;&gt;Auth0&lt;/a&gt;, and &lt;a href=&quot;https://www.onelogin.com/&quot;&gt;Onelogin&lt;/a&gt; to secure there complete cloud solutions.&lt;/p&gt;
+
+&lt;p&gt;Now with this support we can use same OIDC identity providers with less effort to provide Authentication to Web Apps and Web Pages which are behind the AWS ALB (Applcation Loadbalancer). It also helps to take off the load of authentication of users form web application. In this article i will be showing how we can use AWS ALB builtin authentication with OKTA OIDC.&lt;/p&gt;
+
+&lt;h2 id=&quot;assumptions&quot;&gt;Assumptions&lt;/h2&gt;
+
+&lt;p&gt;OKTA Organization URL → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com&lt;/code&gt;&lt;br /&gt;
+ALB Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt;&lt;br /&gt;
+Architecture&lt;br /&gt;
+&lt;img src=&quot;/assets/images/okta1.jpg&quot; alt=&quot;AWS OKTA Arch&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;configuring-okta&quot;&gt;Configuring OKTA&lt;/h2&gt;
+
+&lt;p&gt;Create a new OKTA Developer Account. We will be creating a new Client Application from Applications → Add Applications. Select the Application Platform as WEB
+&lt;img src=&quot;/assets/images/okta2.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Give Application label → Any Name&lt;br /&gt;
+Login redirect URIs → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com/oauth2/idpresponse&lt;/code&gt;&lt;br /&gt;
+Initiate login URI → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt;&lt;br /&gt;
+Group assignments → Everyone or Any Specific Group&lt;br /&gt;
+Grant type allowed → Authorization Code only
+Once Created Note down the Client Credentials → Client ID &amp;amp; Client Secret&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/images/okta3.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+And in Assignments make sure you have atleast one User assigned to login.&lt;/p&gt;
+
+&lt;p&gt;Goto API → Authorization Servers, Get your Issuer URI from there.&lt;br /&gt;
+&lt;img src=&quot;/assets/images/okta4.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Now all your Endpoints will be&lt;/strong&gt;&lt;br /&gt;
+Issuer Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default&lt;/code&gt;&lt;br /&gt;
+Authorization Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/authorize&lt;/code&gt;&lt;br /&gt;
+Token Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/token&lt;/code&gt;&lt;br /&gt;
+User Info Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/userinfo&lt;/code&gt;&lt;br /&gt;
+Client ID &amp;amp; Client Secret → Get from the OKTA Client Application.&lt;/p&gt;
+
+&lt;h2 id=&quot;configuring-aws-application-load-balancer&quot;&gt;Configuring AWS Application Load Balancer&lt;/h2&gt;
+
+&lt;p&gt;Assuming that Load Balancers, Target Groups and EC2 Instances have properly configured. Goto Amazon EC2 → Load Balancers → Select required ALB → Click on Listeners TAB → Select HTTPS → Click on Edit. You will be Redirected to Listener Pages
+&lt;img src=&quot;/assets/images/okta5.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+Click on Add Action → Select Authenticate.&lt;br /&gt;
+&lt;strong&gt;Under Authenticate&lt;/strong&gt;&lt;br /&gt;
+Authenticate → OIDC&lt;br /&gt;
+Issuer Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default&lt;/code&gt;&lt;br /&gt;
+Authorization Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/authorize&lt;/code&gt;&lt;br /&gt;
+Token Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/token&lt;/code&gt;&lt;br /&gt;
+User Info Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/userinfo&lt;/code&gt;&lt;br /&gt;
+Client ID &amp;amp; Client Secret → Get it from your OKTA Client Application.&lt;br /&gt;
+&lt;img src=&quot;/assets/images/okta6.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+&lt;strong&gt;Under Advanced Settings&lt;/strong&gt;&lt;br /&gt;
+Session cookie name → &lt;code class=&quot;highlighter-rouge&quot;&gt;AWSELBAuthSessionCookie&lt;/code&gt;&lt;br /&gt;
+Session timeout → &lt;code class=&quot;highlighter-rouge&quot;&gt;300&lt;/code&gt;&lt;br /&gt;
+Scope → &lt;code class=&quot;highlighter-rouge&quot;&gt;openid profile&lt;/code&gt;&lt;br /&gt;
+Action on unauthenticated request → &lt;code class=&quot;highlighter-rouge&quot;&gt;Authenticate (client reattempt)&lt;/code&gt;&lt;br /&gt;
+&lt;img src=&quot;/assets/images/okta7.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+Now Click Save or Update. Visit &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt; or your Load Balancer URL which will be redirected to OKTA Sign in Page
+&lt;img src=&quot;/assets/images/okta8.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+Once Logged in You will able to view the site and AWS ALB Session Cookie is Set.
+&lt;img src=&quot;/assets/images/okta9.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;shortcomings&quot;&gt;Shortcomings&lt;/h2&gt;
+
+&lt;p&gt;When an application needs to log out an authenticated user, it should set the expiration time of the authentication session cookie (AWSELBAuthSessionCookie) to -1 and redirect the client to the IdP (OKTA ) logout endpoint which is&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;GET https://dev-267174.okta.com/oauth2/default/v1/logout?id_token_hint=${id_token}&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Since we do not have the id_token to make this request because the id_token was give to AWS ALB, we cannot see this in browser also, AWS ALB internally gets the id_token and sets the session cookie.
+One way to overcome this is set short session timeout like 300 seconds in loadbalancer configuration. &lt;a href=&quot;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html#authentication-logout-timeout&quot;&gt;Refer here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html&quot;&gt;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://connect2id.com/learn/openid-connect&quot;&gt;https://connect2id.com/learn/openid-connect&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://developer.okta.com/docs/api/resources/oidc&quot;&gt;https://developer.okta.com/docs/api/resources/oidc&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="okta" /><category term="aws" /><summary type="html">Contents Introduction Assumptions Configuring OKTA Configuring AWS Application Load Balancer Shortcomings Resources</summary></entry><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T16:32:06+05:30</published><updated>2018-09-26T16:32:06+05:30</updated><id>https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">&lt;p&gt;&lt;img src=&quot;/assets/images/tomcat-log-rotation.jpg&quot; alt=&quot;Tomcat Log Rotation&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.&lt;/p&gt;
 
@@ -80,7 +170,7 @@ Big3secret
 &lt;p&gt;For Decryption of files&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gpg &lt;span class=&quot;nt&quot;&gt;--batch&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--passphrase-file&lt;/span&gt; /data/mykey &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz.gpg &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="https://shreyasmm.com/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T16:32:06+05:30</published><updated>2018-09-25T16:32:06+05:30</updated><id>https://shreyasmm.com/how-to-install-tomcat</id><content type="html" xml:base="https://shreyasmm.com/how-to-install-tomcat">&lt;p&gt;&lt;img src=&quot;/assets/images/install-tomcat.jpg&quot; alt=&quot;How to Install Tomcat&quot; /&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="https://www.shreyasmm.com/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T16:32:06+05:30</published><updated>2018-09-25T16:32:06+05:30</updated><id>https://www.shreyasmm.com/how-to-install-tomcat</id><content type="html" xml:base="https://www.shreyasmm.com/how-to-install-tomcat">&lt;p&gt;&lt;img src=&quot;/assets/images/install-tomcat.jpg&quot; alt=&quot;How to Install Tomcat&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Tomcat is web server and servlet container which is used to run java applications, i will be showing the steps to install tomcat and java in an production system. i will be installing Tomcat 9 and OpenJDK 1.8 (Java 8). Most Steps are common for Redhat and Debian based systems.&lt;/p&gt;
 
@@ -190,7 +280,7 @@ wget http://mirrors.wuchna.com/apachemirror/tomcat/tomcat-9/v9.0.12/bin/apache-t
 &lt;p&gt;Make sure all the Files in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt; belong to Tomcat user and group, Run this Command whenever you new deploy WAR in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/webapps&lt;/code&gt;&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; tomcat:tomcat /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="https://shreyasmm.com/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T16:32:06+05:30</published><updated>2017-03-19T16:32:06+05:30</updated><id>https://shreyasmm.com/install-nodejs-ubuntu</id><content type="html" xml:base="https://shreyasmm.com/install-nodejs-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/how-to-install-nodejs.jpg&quot; alt=&quot;How to Install Nodejs on Ubuntu&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="https://www.shreyasmm.com/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T16:32:06+05:30</published><updated>2017-03-19T16:32:06+05:30</updated><id>https://www.shreyasmm.com/install-nodejs-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-nodejs-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/how-to-install-nodejs.jpg&quot; alt=&quot;How to Install Nodejs on Ubuntu&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Today I am going to show How to install &lt;a href=&quot;https://nodejs.org&quot;&gt;nodejs&lt;/a&gt; on your ubuntu machine of any version, you can install multiple versions of nodejs at same time using nvm.&lt;/p&gt;
 
@@ -236,7 +326,7 @@ wget http://mirrors.wuchna.com/apachemirror/tomcat/tomcat-9/v9.0.12/bin/apache-t
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;4.8.0&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; .nvmrc
 nvm use
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="nodejs" /><category term="nvm" /><summary type="html"></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="https://shreyasmm.com/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T16:32:06+05:30</published><updated>2016-09-12T16:32:06+05:30</updated><id>https://shreyasmm.com/i-just-cleared-rhce</id><content type="html" xml:base="https://shreyasmm.com/i-just-cleared-rhce">&lt;p&gt;&lt;img src=&quot;/assets/images/rhce.jpg&quot; alt=&quot;RHCE Logo&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="nodejs" /><category term="nvm" /><summary type="html"></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="https://www.shreyasmm.com/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T16:32:06+05:30</published><updated>2016-09-12T16:32:06+05:30</updated><id>https://www.shreyasmm.com/i-just-cleared-rhce</id><content type="html" xml:base="https://www.shreyasmm.com/i-just-cleared-rhce">&lt;p&gt;&lt;img src=&quot;/assets/images/rhce.jpg&quot; alt=&quot;RHCE Logo&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After Two months preparation i finally cleared RHCE, on 27 Aug 2016 i received a mail saying congratulation on earning RHCE. the whole week was bliss, well i had cleared RHCSA with 300/300, RHCE with 271/300. I have done my RHCE on Red Hat Enterprise Linux 7.&lt;/p&gt;
 
@@ -259,7 +349,7 @@ nvm use
 
 &lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;&lt;br /&gt;
 Practice as much as Possible
-Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="rhce" /><summary type="html"></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="https://shreyasmm.com/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T16:32:06+05:30</published><updated>2016-06-07T16:32:06+05:30</updated><id>https://shreyasmm.com/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="https://shreyasmm.com/setup-virtualbox-for-local-development-environment">&lt;p&gt;&lt;img src=&quot;/assets/images/virtualbox.jpg&quot; alt=&quot;Setup Virtualbox for Local Development Environment&quot; /&gt;&lt;/p&gt;
+Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="rhce" /><summary type="html"></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T16:32:06+05:30</published><updated>2016-06-07T16:32:06+05:30</updated><id>https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment">&lt;p&gt;&lt;img src=&quot;/assets/images/virtualbox.jpg&quot; alt=&quot;Setup Virtualbox for Local Development Environment&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hi Today i am going show you how to setup virtualbox for local Development which will be useful when you are developing / deploying application inside the virtual machine and want to interact with it outside the virtual machine or from host machine,this is also helpful when you are developing for openstack you have installed openstack in vm and want to interact and test the api from host machine, before starting download &amp;amp; install &lt;a href=&quot;https://www.virtualbox.org&quot;&gt;Virtualbox&lt;/a&gt;.&lt;/p&gt;
 
@@ -330,7 +420,7 @@ auto enp0s8
 iface enp0s8 inet dhcp
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Once the vm is booted find the ip address given by hostonly adapter by running &lt;code class=&quot;highlighter-rouge&quot;&gt;ip a&lt;/code&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;enp0s8&lt;/code&gt;  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run &lt;code class=&quot;highlighter-rouge&quot;&gt;ping [ip address of vm]&lt;/code&gt;, install webserver on vm open it on host machine.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="https://shreyasmm.com/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T16:32:06+05:30</published><updated>2016-03-09T16:32:06+05:30</updated><id>https://shreyasmm.com/install-django-on-ubuntu</id><content type="html" xml:base="https://shreyasmm.com/install-django-on-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/installing-django-on-ubuntu.jpg&quot; alt=&quot;Installing Django on Ubuntu&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;Once the vm is booted find the ip address given by hostonly adapter by running &lt;code class=&quot;highlighter-rouge&quot;&gt;ip a&lt;/code&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;enp0s8&lt;/code&gt;  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run &lt;code class=&quot;highlighter-rouge&quot;&gt;ping [ip address of vm]&lt;/code&gt;, install webserver on vm open it on host machine.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="https://www.shreyasmm.com/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T16:32:06+05:30</published><updated>2016-03-09T16:32:06+05:30</updated><id>https://www.shreyasmm.com/install-django-on-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-django-on-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/installing-django-on-ubuntu.jpg&quot; alt=&quot;Installing Django on Ubuntu&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Today i am going to show how to setup or install &lt;a href=&quot;https://www.djangoproject.com&quot;&gt;Django&lt;/a&gt; environment on Ubuntu. I will be concentrating only on python 3 version. Django is web application framework written in python, It Uses MVT (Models, Views, Templates) Concept .&lt;/p&gt;
 
@@ -397,17 +487,17 @@ iface enp0s8 inet dhcp
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;Code/Django/myapp
 &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;py3/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="django" /><category term="ubuntu" /><summary type="html"></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="https://shreyasmm.com/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T16:32:06+05:30</published><updated>2015-12-10T16:32:06+05:30</updated><id>https://shreyasmm.com/device-drivers-linux</id><content type="html" xml:base="https://shreyasmm.com/device-drivers-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/device-drivers.jpg&quot; alt=&quot;Device Drivers in Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="django" /><category term="ubuntu" /><summary type="html"></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="https://www.shreyasmm.com/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T16:32:06+05:30</published><updated>2015-12-10T16:32:06+05:30</updated><id>https://www.shreyasmm.com/device-drivers-linux</id><content type="html" xml:base="https://www.shreyasmm.com/device-drivers-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/device-drivers.jpg&quot; alt=&quot;Device Drivers in Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;This is my Advance Operating System Assignment. I will show how to Compile Linux Kernel from Source,You can download Linux Kernel From &lt;a href=&quot;https://www.kernel.org&quot;&gt;Here&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;https://www.slideshare.net/MMShreyas/device-drivers-in-linux&lt;/p&gt;
 
-&lt;p&gt;I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="linux" /><category term="presentations" /><summary type="html"></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T16:32:06+05:30</published><updated>2015-12-05T16:32:06+05:30</updated><id>https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="https://shreyasmm.com/containers-cloud-lxc-docker-kubernetes">&lt;p&gt;&lt;img src=&quot;/assets/images/containers-cloud-lxc-docker-kubernetes.jpg&quot; alt=&quot;Containers and Cloud: From LXC to Docker to Kubernetes&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="linux" /><category term="presentations" /><summary type="html"></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T16:32:06+05:30</published><updated>2015-12-05T16:32:06+05:30</updated><id>https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes">&lt;p&gt;&lt;img src=&quot;/assets/images/containers-cloud-lxc-docker-kubernetes.jpg&quot; alt=&quot;Containers and Cloud: From LXC to Docker to Kubernetes&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Well this is December a month full of Exams, Assignments, Seminars.This is my Seminar Topic Containers and Cloud: From LXC to Docker to Kubernetes, it speaks about how present Cloud system is moving from Hypervisors to Docker &amp;amp; Kubernetes.&lt;/p&gt;
 
-&lt;p&gt;https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="docker" /><summary type="html"></summary></entry><entry><title type="html">AVL Trees Implementation in Python</title><link href="https://shreyasmm.com/avl-trees-implementation-in-python" rel="alternate" type="text/html" title="AVL Trees Implementation in Python" /><published>2015-11-16T16:32:06+05:30</published><updated>2015-11-16T16:32:06+05:30</updated><id>https://shreyasmm.com/avl-trees-implementation-in-python</id><content type="html" xml:base="https://shreyasmm.com/avl-trees-implementation-in-python">&lt;p&gt;&lt;img src=&quot;/assets/images/py-avl.jpg&quot; alt=&quot;AVL Trees Implementation in Python&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="docker" /><summary type="html"></summary></entry><entry><title type="html">AVL Trees Implementation in Python</title><link href="https://www.shreyasmm.com/avl-trees-implementation-in-python" rel="alternate" type="text/html" title="AVL Trees Implementation in Python" /><published>2015-11-16T16:32:06+05:30</published><updated>2015-11-16T16:32:06+05:30</updated><id>https://www.shreyasmm.com/avl-trees-implementation-in-python</id><content type="html" xml:base="https://www.shreyasmm.com/avl-trees-implementation-in-python">&lt;p&gt;&lt;img src=&quot;/assets/images/py-avl.jpg&quot; alt=&quot;AVL Trees Implementation in Python&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;I had an Assignment Recently in Advance Data Structures Course to implement AVL Trees. So Here is the source code for it. I am not going to explain what AVL Trees is, since there are many better tutorials out there.
 Download from Here or Clone the GitHub Repository enter below command&lt;/p&gt;
@@ -424,40 +514,4 @@ Execute Command in Terminal&lt;/p&gt;
 
 &lt;p&gt;Output
 &lt;img src=&quot;/assets/images/py-avl-output1.jpg&quot; alt=&quot;AVL Trees Output 1&quot; /&gt;
-&lt;img src=&quot;/assets/images/py-avl-output2.jpg&quot; alt=&quot;AVL Trees Output 2&quot; /&gt;&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="avl-trees" /><category term="python" /><summary type="html"></summary></entry><entry><title type="html">Create a Ramdisk in Ubuntu Linux</title><link href="https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux" rel="alternate" type="text/html" title="Create a Ramdisk in Ubuntu Linux" /><published>2015-10-22T16:32:06+05:30</published><updated>2015-10-22T16:32:06+05:30</updated><id>https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux</id><content type="html" xml:base="https://shreyasmm.com/create-a-ramdisk-in-ubuntu-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/ram-disk-in-ubuntu.jpg&quot; alt=&quot;Create a Ramdisk in Ubuntu Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Today i am going to show you how to create a ramdisk in Ubuntu, but the same applies for other Linux Distributions also. Before going to point i want to make clear why you need ramdisk in first place.&lt;/p&gt;
-
-&lt;p&gt;ramdisk is useful in many places like if you are watching an HD movie from harddisk. The disk always keeps up spinning, which may reduce the life of the hard disk, other place is in software applications, if you move ide like Android Studio or Intellij IDEA to ramdisk they offer more performance&lt;/p&gt;
-
-&lt;p&gt;In order to get full performance you need to have more ram like 8 GB. its not like if you have less ram you cannot create ramdisk, you can create but you cannot load big files to ram.&lt;/p&gt;
-
-&lt;p&gt;Create a directory first&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /home/shrey/Others/Ramdisk
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;we use mount command -t specifies type is tmpfs is temporary filesystem source is tmpfs destination is my home directory and the size is 2GB.&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;mount &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; tmpfs tmpfs /home/shrey/Others/Ramdisk &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2048m
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Note the destination directory should be created first then run this command, Ramdisk are volatile after you shutdown the data will be lost, so be careful do not copy original files to disk as they will lost after shutdown, crash, reboot.&lt;/p&gt;
-
-&lt;p&gt;To easily use this command we create an alias&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ramdisk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;sudo mount -t tmpfs tmpfs /home/shrey/Others/Ramdisk -o size=2048m&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;paste this in your .bashrc or .zshrc or .alias file. Restart the terminal and run ramdisk command, ramdisk will be created. Go the destination directory copy a movie file over there mine is in &lt;code class=&quot;highlighter-rouge&quot;&gt;/home/shrey/Others/Ramdisk&lt;/code&gt; play the movie from there. You can see the movie is loaded from ram so it will be faster. and no hard disk is used here to play the movie.&lt;/p&gt;
-
-&lt;p&gt;If you want ramdisk to be created at every startup or reboot edit &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /etc/fstab&lt;/code&gt; Add bellow line at the end of the file.&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;tmpfs /home/shrey/Others/Ramdisk tmpfs rw,size&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2048M 0 0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now you don need to run the command ramdisk every time.&lt;/p&gt;
-
-&lt;p&gt;I mostly use ram disk for watching movies for 2+ hours best use of ramdisk is loading the static files like html, js, fonts &amp;amp; images in ramdisk it could increase the server response time and disk performance of web server .&lt;/p&gt;
-
-&lt;p&gt;For ease of access in Ubuntu Desktop open the folder Ramdisk in Files app or Nautilus in menu Bookmarks -&amp;gt; Bookmark this Location you will get the directory in left sidebar.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="ubuntu" /><summary type="html"></summary></entry></feed>
+&lt;img src=&quot;/assets/images/py-avl-output2.jpg&quot; alt=&quot;AVL Trees Output 2&quot; /&gt;&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="avl-trees" /><category term="python" /><summary type="html"></summary></entry></feed>
