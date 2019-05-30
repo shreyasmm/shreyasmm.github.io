@@ -12,6 +12,7 @@
   <meta name="author" content="Shreyas MM" />
   <link rel="canonical" href="https://www.shreyasmm.com/i-just-cleared-rhce">
   <link rel="alternate" type="application/rss+xml" title="Shreyas M M RSS Feed" href="https://www.shreyasmm.com/feed/"/>
+  <link rel="manifest" href="manifest.json">
   
   <!-- Opengraph Tags-->
   <meta property="og:locale" content="en_US" />
@@ -36,6 +37,15 @@
   <meta name="msvalidate.01" content="D73088A8361569DAFEC6811253CC8650" />
   <meta name="google-site-verification" content="he_TNo_sziGYbuzO0scYOvah35aCKTRPxs7EgC6zUbA" />
   <meta name="p:domain_verify" content="d8cf9bbeb8710ec2414c2aa169e8cc56" /> 
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-64993201-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-64993201-1');
+  </script>
 
   <style type="text/css">
     
@@ -1041,5 +1051,23 @@ Remember when you are practising, follow this approach – Try solving the probl
     <script data-no-instant>
       InstantClick.init();
     </script> -->
+    
+<script type="text/javascript">
+// Registration of service worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register("/sw.js").then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+}
+else{
+    console.log('Service Workers not supported');
+}
+</script>
   </body>
 </html>

@@ -1,0 +1,11 @@
+{
+    "name": "Shreyas MM",
+    "short_name": "Shreyas MM",
+    "description": "My Everyday Discoveries",
+    "lang": "en-US",
+    "theme_color": "#2196f3",
+    "background_color": "#2196f3",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/"
+}
