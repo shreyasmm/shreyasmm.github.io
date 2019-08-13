@@ -992,6 +992,25 @@ Licensed MIT
   <h1>Cheet Sheet</h1>
   <p>Most of the commands i use at work which used for my reference</p>
 
+<h2 id="aws">AWS</h2>
+
+<p>Copy, Move, Sync Files to S3 Bucket (Note – Attach S3 Write Access Role to EC2 Instance)</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws s3 <span class="nb">cp </span>database-backup.sql s3://bucketname
+aws s3 <span class="nb">mv </span>database-backup.sql s3://bucketname
+aws s3 <span class="nb">sync </span>database-backup.sql s3://bucketname
+</code></pre></div></div>
+
+<p>Cloudformation</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws cloudformation validate-template <span class="nt">--template-body</span> file://secrets.yaml
+</code></pre></div></div>
+
+<p>Load Balancer Test</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while </span><span class="nb">true</span><span class="p">;</span> <span class="k">do </span><span class="nb">echo</span> <span class="nt">-n</span> <span class="k">$(</span><span class="nb">date</span> <span class="s2">"+%H:%M:%S"</span><span class="k">)</span><span class="p">;</span> curl  <span class="nt">-H</span> <span class="s2">"Host: dev.api.cloud.com"</span> https://52.5.250.163/vpc/test <span class="p">;</span> <span class="nb">echo</span> <span class="p">;</span> <span class="k">done</span>
+</code></pre></div></div>
+
 <h2 id="mysql">MYSQL</h2>
 
 <p>Show Database by Size</p>
@@ -1058,13 +1077,6 @@ gpg <span class="nt">--batch</span> <span class="nt">--passphrase-file</span> ke
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ncdu /
 <span class="nb">df</span> <span class="nt">-h</span>
-</code></pre></div></div>
-
-<p>Copy, Move, Sync Files to S3 Bucket (Note – Attach S3 Write Access Role to EC2 Instance)</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws s3 <span class="nb">cp </span>database-backup.sql s3://bucketname
-aws s3 <span class="nb">mv </span>database-backup.sql s3://bucketname
-aws s3 <span class="nb">sync </span>database-backup.sql s3://bucketname
 </code></pre></div></div>
 
 </div>

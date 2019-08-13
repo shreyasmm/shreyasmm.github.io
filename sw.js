@@ -158,6 +158,10 @@ var CACHE_NAME = 'shreyas-mm-cache-v3';
     
 
     
+      urlsToCache.push("/assets/favicons/manifest.json");
+    
+
+    
       urlsToCache.push("/assets/favicons/ms-icon-144x144.png");
     
 
