@@ -6,6 +6,8 @@ var CACHE_NAME = 'shreyas-mm-cache-v3';
 // Limits the number of posts that gets cached to 3
 // Reads a piece of front-matter in each post that directs the second loop to the folder where the assets are held
 
+  urlsToCache.push("/cost-cutting-strategies-for-developers");
+
   urlsToCache.push("/securing-web-applications-with-aws-elb-and-okta");
 
   urlsToCache.push("/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3");
@@ -62,6 +64,8 @@ var CACHE_NAME = 'shreyas-mm-cache-v3';
 
 // Cache assets
 // Removed assets/posts because I only want assets from the most recent posts getting cached
+
+    
 
     
 
@@ -261,6 +265,10 @@ var CACHE_NAME = 'shreyas-mm-cache-v3';
 
     
       urlsToCache.push("/assets/images/containers-cloud-lxc-docker-kubernetes.jpg");
+    
+
+    
+      urlsToCache.push("/assets/images/cost.jpg");
     
 
     

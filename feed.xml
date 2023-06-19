@@ -1,595 +1,542 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="https://www.shreyasmm.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.shreyasmm.com/" rel="alternate" type="text/html" /><updated>2019-08-14T00:36:32+05:30</updated><id>https://www.shreyasmm.com/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Securing Web Applications with AWS ALB Authentication and OKTA OIDC</title><link href="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta" rel="alternate" type="text/html" title="Securing Web Applications with AWS ALB Authentication and OKTA OIDC" /><published>2019-04-08T10:32:06+05:30</published><updated>2019-04-08T10:32:06+05:30</updated><id>https://www.shreyasmm.com/securing-web-applications-with-aws-elb</id><content type="html" xml:base="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta">&lt;p&gt;&lt;img src=&quot;/assets/images/okta.jpg&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
-&lt;strong&gt;Contents&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#assumptions&quot;&gt;Assumptions&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#configuring-okta&quot;&gt;Configuring OKTA&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#configuring-aws-application-load-balancer&quot;&gt;Configuring AWS Application Load Balancer&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#shortcomings&quot;&gt;Shortcomings&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#resources&quot;&gt;Resources&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://www.shreyasmm.com/feed.xml" rel="self" type="application/atom+xml" /><link href="https://www.shreyasmm.com/" rel="alternate" type="text/html" /><updated>2023-06-19T11:04:12+00:00</updated><id>https://www.shreyasmm.com/feed.xml</id><title type="html">Shreyas M M</title><subtitle>My Everyday Discoveries</subtitle><author><name>Shreyas M M</name></author><entry><title type="html">Cost-Cutting Strategies for Developers</title><link href="https://www.shreyasmm.com/cost-cutting-strategies-for-developers" rel="alternate" type="text/html" title="Cost-Cutting Strategies for Developers" /><published>2023-06-18T18:18:06+00:00</published><updated>2023-06-18T18:18:06+00:00</updated><id>https://www.shreyasmm.com/cost-cutting-strategies-for-developers</id><content type="html" xml:base="https://www.shreyasmm.com/cost-cutting-strategies-for-developers"><![CDATA[<p><img src="/assets/images/cost.jpg" alt="Cost-Cutting Strategies for Developers" /></p>
 
-&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<p>The Theme of this year is <strong>Cost Cutting</strong>,  In the pursuit of cost-cutting, developers and DevOps engineers play a crucial role in identifying and implementing strategies that optimize resource usage and reduce expenses. This article explores powerful cost-saving measures, including leveraging AWS Graviton processors, adopting containerization and orchestration, optimizing program performance, and fostering a cost-conscious culture within development and DevOps teams.</p>
 
-&lt;p&gt;AWS Elastic Load Balancer Service has introduced Builtin Authentication which supports any third party OIDC (&lt;a href=&quot;https://openid.net/connect/&quot;&gt;Open ID Connect&lt;/a&gt;) Identity provider or &lt;a href=&quot;https://aws.amazon.com/cognito/&quot;&gt;AWS Cognito&lt;/a&gt;.&lt;/p&gt;
+<ol>
+  <li>
+    <p>Leveraging AWS Graviton: AWS Graviton arm64 processors offer exceptional price-performance ratios, making them an excellent choice for cost-conscious organizations. Key considerations include:</p>
 
-&lt;p&gt;Many organizations use centralized identity servers like &lt;a href=&quot;https://www.okta.com&quot;&gt;OKTA&lt;/a&gt;, &lt;a href=&quot;https://azure.microsoft.com/en-in/services/active-directory/&quot;&gt;Azure Active Directory&lt;/a&gt;, &lt;a href=&quot;https://auth0.com/&quot;&gt;Auth0&lt;/a&gt;, and &lt;a href=&quot;https://www.onelogin.com/&quot;&gt;Onelogin&lt;/a&gt; to secure there complete cloud solutions.&lt;/p&gt;
+    <p>Broad Compute Service Support: AWS has extended Graviton support to all major compute services, including EC2, EKS, ECS, RDS, Redshift, and more. Check out the <a href="https://github.com/aws/aws-graviton-getting-started/blob/main/managed_services.md">complete list</a> for details. Make use of Graviton EC2 instances and consider rewriting code to run in Lambda Graviton arm64 environments for enhanced cost efficiency.</p>
 
-&lt;p&gt;Now with this support we can use same OIDC identity providers with less effort to provide Authentication to Web Apps and Web Pages which are behind the AWS ALB (Applcation Loadbalancer). It also helps to take off the load of authentication of users form web application. In this article i will be showing how we can use AWS ALB builtin authentication with OKTA OIDC.&lt;/p&gt;
+    <p>Third-Generation Graviton Processors: The latest generation of Graviton processors offers improved performance and cost savings. Stay up-to-date with AWS announcements and evaluate how the third-generation processors can benefit your workloads.</p>
 
-&lt;h2 id=&quot;assumptions&quot;&gt;Assumptions&lt;/h2&gt;
+    <p>Multi-Architecture Support: Leverage the added support for multi-architecture (arm64) images in AWS Elastic Container Registry (ECR). This allows you to optimize resource usage by utilizing Graviton processors when working with containerized applications.</p>
+  </li>
+  <li>
+    <p>Containerization and Orchestration: Containerization offers significant cost-cutting advantages by optimizing resource allocation, scalability, and deployment efficiency. Consider the following steps:</p>
 
-&lt;p&gt;OKTA Organization URL → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com&lt;/code&gt;&lt;br /&gt;
-ALB Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt;&lt;br /&gt;
-Architecture&lt;br /&gt;
-&lt;img src=&quot;/assets/images/okta1.jpg&quot; alt=&quot;AWS OKTA Arch&quot; /&gt;&lt;/p&gt;
+    <p>Utilize Docker and Kubernetes: Adopt containerization platforms like Docker and container orchestration tools such as Kubernetes to efficiently manage computing resources. These tools enable streamlined deployment and scaling of applications, resulting in reduced infrastructure costs.</p>
 
-&lt;h2 id=&quot;configuring-okta&quot;&gt;Configuring OKTA&lt;/h2&gt;
+    <p>Embrace Serverless (Lambda): Identify underutilized resources and transition appropriate workloads to serverless architectures using AWS Lambda. By leveraging serverless computing, you pay only for the actual execution time, eliminating the need for continuous infrastructure maintenance.</p>
+  </li>
+  <li>
+    <p>Performance Optimization: Optimizing program performance can lead to significant cost savings. Consider the following steps:</p>
 
-&lt;p&gt;Create a new OKTA Developer Account. We will be creating a new Client Application from Applications → Add Applications. Select the Application Platform as WEB
-&lt;img src=&quot;/assets/images/okta2.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+    <p>Multi-Core Aware Programs: Write code that utilizes multiple CPUs present in the environment. Utilize concurrency features like Python’s <code class="language-plaintext highlighter-rouge">multiprocessing</code> library to execute tasks across multiple cores, improving execution times and optimizing resource utilization.</p>
 
-&lt;p&gt;Give Application label → Any Name&lt;br /&gt;
-Login redirect URIs → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com/oauth2/idpresponse&lt;/code&gt;&lt;br /&gt;
-Initiate login URI → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt;&lt;br /&gt;
-Group assignments → Everyone or Any Specific Group&lt;br /&gt;
+    <p>Switch to Efficient Programming Languages: Consider migrating to programming languages like Rust and Go, known for their memory efficiency and performance. These languages can help reduce resource consumption, resulting in lower operational costs.</p>
+  </li>
+  <li>
+    <p>Fostering a Cost-Conscious Culture: Promote a cost-conscious mindset within development and DevOps teams to enhance cost optimization efforts. Encourage the following:</p>
+
+    <p>Regular Code Reviews: Review code regularly to identify areas for optimization, reduce resource consumption, and enhance overall efficiency.</p>
+
+    <p>Team Collaboration: Facilitate collaboration between development, operations, and finance teams to align on cost-saving initiatives and share responsibility for optimizing resource usage.</p>
+  </li>
+</ol>
+
+<p>Conclusion: In the pursuit of cost-cutting, developers and DevOps engineers have numerous opportunities to optimize resource usage and reduce expenses. By leveraging AWS Graviton processors, adopting containerization and orchestration, optimizing program performance, and fostering a cost-conscious culture, organizations can achieve significant cost savings while maintaining operational excellence in today’s competitive landscape.</p>
+
+<h2 id="references">References</h2>
+<ol>
+  <li><a href="https://aws.amazon.com/ec2/graviton/">https://aws.amazon.com/ec2/graviton/</a></li>
+  <li><a href="https://aws.amazon.com/blogs/aws/aws-lambda-functions-powered-by-aws-graviton2-processor-run-your-functions-on-arm-and-get-up-to-34-better-price-performance/">https://aws.amazon.com/blogs/aws/aws-lambda-functions-powered-by-aws-graviton2-processor-run-your-functions-on-arm-and-get-up-to-34-better-price-performance/</a></li>
+  <li><a href="https://docs.python.org/3/library/multiprocessing.html">https://docs.python.org/3/library/multiprocessing.html</a></li>
+  <li><a href="https://aws.plainenglish.io/aws-lambda-now-supports-arm64-graviton2-a-win-for-our-planet-b8d4b86a8427">https://aws.plainenglish.io/aws-lambda-now-supports-arm64-graviton2-a-win-for-our-planet-b8d4b86a8427</a></li>
+  <li><a href="https://aws.amazon.com/blogs/aws/aws-lambda-functions-powered-by-aws-graviton2-processor-run-your-functions-on-arm-and-get-up-to-34-better-price-performance/">https://aws.amazon.com/blogs/aws/aws-lambda-functions-powered-by-aws-graviton2-processor-run-your-functions-on-arm-and-get-up-to-34-better-price-performance/</a></li>
+  <li><a href="https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-to-arm-based-aws-graviton2-processors/">https://aws.amazon.com/blogs/compute/migrating-aws-lambda-functions-to-arm-based-aws-graviton2-processors/</a></li>
+</ol>]]></content><author><name>Shreyas M M</name></author><category term="server" /><category term="aws" /><category term="programming" /><category term="cloud" /><category term="aws" /><category term="graviton" /><summary type="html"><![CDATA[Cost-Cutting Strategies for Developers and DevOps Engineers in 2023]]></summary></entry><entry><title type="html">Securing Web Applications with AWS ALB Authentication and OKTA OIDC</title><link href="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta" rel="alternate" type="text/html" title="Securing Web Applications with AWS ALB Authentication and OKTA OIDC" /><published>2019-04-08T05:02:06+00:00</published><updated>2019-04-08T05:02:06+00:00</updated><id>https://www.shreyasmm.com/securing-web-applications-with-aws-elb</id><content type="html" xml:base="https://www.shreyasmm.com/securing-web-applications-with-aws-elb-and-okta"><![CDATA[<p><img src="/assets/images/okta.jpg" alt="AWS ELB Authentication with OKTA" />
+<strong>Contents</strong></p>
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#assumptions">Assumptions</a></li>
+  <li><a href="#configuring-okta">Configuring OKTA</a></li>
+  <li><a href="#configuring-aws-application-load-balancer">Configuring AWS Application Load Balancer</a></li>
+  <li><a href="#shortcomings">Shortcomings</a></li>
+  <li><a href="#resources">Resources</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>AWS Elastic Load Balancer Service has introduced Builtin Authentication which supports any third party OIDC (<a href="https://openid.net/connect/">Open ID Connect</a>) Identity provider or <a href="https://aws.amazon.com/cognito/">AWS Cognito</a>.</p>
+
+<p>Many organizations use centralized identity servers like <a href="https://www.okta.com">OKTA</a>, <a href="https://azure.microsoft.com/en-in/services/active-directory/">Azure Active Directory</a>, <a href="https://auth0.com/">Auth0</a>, and <a href="https://www.onelogin.com/">Onelogin</a> to secure there complete cloud solutions.</p>
+
+<p>Now with this support we can use same OIDC identity providers with less effort to provide Authentication to Web Apps and Web Pages which are behind the AWS ALB (Applcation Loadbalancer). It also helps to take off the load of authentication of users form web application. In this article i will be showing how we can use AWS ALB builtin authentication with OKTA OIDC.</p>
+
+<h2 id="assumptions">Assumptions</h2>
+
+<p>OKTA Organization URL → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com</code><br />
+ALB Endpoint → <code class="language-plaintext highlighter-rouge">https://www.alb-okta-test.com</code><br />
+Architecture<br />
+<img src="/assets/images/okta1.jpg" alt="AWS OKTA Arch" /></p>
+
+<h2 id="configuring-okta">Configuring OKTA</h2>
+
+<p>Create a new OKTA Developer Account. We will be creating a new Client Application from Applications → Add Applications. Select the Application Platform as WEB
+<img src="/assets/images/okta2.png" alt="AWS ELB Authentication with OKTA" /></p>
+
+<p>Give Application label → Any Name<br />
+Login redirect URIs → <code class="language-plaintext highlighter-rouge">https://www.alb-okta-test.com/oauth2/idpresponse</code><br />
+Initiate login URI → <code class="language-plaintext highlighter-rouge">https://www.alb-okta-test.com</code><br />
+Group assignments → Everyone or Any Specific Group<br />
 Grant type allowed → Authorization Code only
-Once Created Note down the Client Credentials → Client ID &amp;amp; Client Secret&lt;/p&gt;
+Once Created Note down the Client Credentials → Client ID &amp; Client Secret</p>
 
-&lt;p&gt;&lt;img src=&quot;/assets/images/okta3.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
-And in Assignments make sure you have atleast one User assigned to login.&lt;/p&gt;
+<p><img src="/assets/images/okta3.png" alt="AWS ELB Authentication with OKTA" />
+And in Assignments make sure you have atleast one User assigned to login.</p>
 
-&lt;p&gt;Goto API → Authorization Servers, Get your Issuer URI from there.&lt;br /&gt;
-&lt;img src=&quot;/assets/images/okta4.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+<p>Goto API → Authorization Servers, Get your Issuer URI from there.<br />
+<img src="/assets/images/okta4.png" alt="AWS ELB Authentication with OKTA" /></p>
 
-&lt;p&gt;&lt;strong&gt;Now all your Endpoints will be&lt;/strong&gt;&lt;br /&gt;
-Issuer Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default&lt;/code&gt;&lt;br /&gt;
-Authorization Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/authorize&lt;/code&gt;&lt;br /&gt;
-Token Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/token&lt;/code&gt;&lt;br /&gt;
-User Info Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/userinfo&lt;/code&gt;&lt;br /&gt;
-Client ID &amp;amp; Client Secret → Get from the OKTA Client Application.&lt;/p&gt;
+<p><strong>Now all your Endpoints will be</strong><br />
+Issuer Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default</code><br />
+Authorization Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/authorize</code><br />
+Token Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/token</code><br />
+User Info Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/userinfo</code><br />
+Client ID &amp; Client Secret → Get from the OKTA Client Application.</p>
 
-&lt;h2 id=&quot;configuring-aws-application-load-balancer&quot;&gt;Configuring AWS Application Load Balancer&lt;/h2&gt;
+<h2 id="configuring-aws-application-load-balancer">Configuring AWS Application Load Balancer</h2>
 
-&lt;p&gt;Assuming that Load Balancers, Target Groups and EC2 Instances have properly configured. Goto Amazon EC2 → Load Balancers → Select required ALB → Click on Listeners TAB → Select HTTPS → Click on Edit. You will be Redirected to Listener Pages
-&lt;img src=&quot;/assets/images/okta5.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
-Click on Add Action → Select Authenticate.&lt;br /&gt;
-&lt;strong&gt;Under Authenticate&lt;/strong&gt;&lt;br /&gt;
-Authenticate → OIDC&lt;br /&gt;
-Issuer Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default&lt;/code&gt;&lt;br /&gt;
-Authorization Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/authorize&lt;/code&gt;&lt;br /&gt;
-Token Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/token&lt;/code&gt;&lt;br /&gt;
-User Info Endpoint → &lt;code class=&quot;highlighter-rouge&quot;&gt;https://dev-267174.okta.com/oauth2/default/v1/userinfo&lt;/code&gt;&lt;br /&gt;
-Client ID &amp;amp; Client Secret → Get it from your OKTA Client Application.&lt;br /&gt;
-&lt;img src=&quot;/assets/images/okta6.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
-&lt;strong&gt;Under Advanced Settings&lt;/strong&gt;&lt;br /&gt;
-Session cookie name → &lt;code class=&quot;highlighter-rouge&quot;&gt;AWSELBAuthSessionCookie&lt;/code&gt;&lt;br /&gt;
-Session timeout → &lt;code class=&quot;highlighter-rouge&quot;&gt;300&lt;/code&gt;&lt;br /&gt;
-Scope → &lt;code class=&quot;highlighter-rouge&quot;&gt;openid profile&lt;/code&gt;&lt;br /&gt;
-Action on unauthenticated request → &lt;code class=&quot;highlighter-rouge&quot;&gt;Authenticate (client reattempt)&lt;/code&gt;&lt;br /&gt;
-&lt;img src=&quot;/assets/images/okta7.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
-Now Click Save or Update. Visit &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.alb-okta-test.com&lt;/code&gt; or your Load Balancer URL which will be redirected to OKTA Sign in Page
-&lt;img src=&quot;/assets/images/okta8.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;
+<p>Assuming that Load Balancers, Target Groups and EC2 Instances have properly configured. Goto Amazon EC2 → Load Balancers → Select required ALB → Click on Listeners TAB → Select HTTPS → Click on Edit. You will be Redirected to Listener Pages
+<img src="/assets/images/okta5.png" alt="AWS ELB Authentication with OKTA" />
+Click on Add Action → Select Authenticate.<br />
+<strong>Under Authenticate</strong><br />
+Authenticate → OIDC<br />
+Issuer Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default</code><br />
+Authorization Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/authorize</code><br />
+Token Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/token</code><br />
+User Info Endpoint → <code class="language-plaintext highlighter-rouge">https://dev-267174.okta.com/oauth2/default/v1/userinfo</code><br />
+Client ID &amp; Client Secret → Get it from your OKTA Client Application.<br />
+<img src="/assets/images/okta6.png" alt="AWS ELB Authentication with OKTA" />
+<strong>Under Advanced Settings</strong><br />
+Session cookie name → <code class="language-plaintext highlighter-rouge">AWSELBAuthSessionCookie</code><br />
+Session timeout → <code class="language-plaintext highlighter-rouge">300</code><br />
+Scope → <code class="language-plaintext highlighter-rouge">openid profile</code><br />
+Action on unauthenticated request → <code class="language-plaintext highlighter-rouge">Authenticate (client reattempt)</code><br />
+<img src="/assets/images/okta7.png" alt="AWS ELB Authentication with OKTA" />
+Now Click Save or Update. Visit <code class="language-plaintext highlighter-rouge">https://www.alb-okta-test.com</code> or your Load Balancer URL which will be redirected to OKTA Sign in Page
+<img src="/assets/images/okta8.png" alt="AWS ELB Authentication with OKTA" />
 Once Logged in You will able to view the site and AWS ALB Session Cookie is Set.
-&lt;img src=&quot;/assets/images/okta9.png&quot; alt=&quot;AWS ELB Authentication with OKTA&quot; /&gt;&lt;/p&gt;
+<img src="/assets/images/okta9.png" alt="AWS ELB Authentication with OKTA" /></p>
 
-&lt;h2 id=&quot;shortcomings&quot;&gt;Shortcomings&lt;/h2&gt;
+<h2 id="shortcomings">Shortcomings</h2>
 
-&lt;p&gt;When an application needs to log out an authenticated user, it should set the expiration time of the authentication session cookie (AWSELBAuthSessionCookie) to -1 and redirect the client to the IdP (OKTA ) logout endpoint which is&lt;/p&gt;
+<p>When an application needs to log out an authenticated user, it should set the expiration time of the authentication session cookie (AWSELBAuthSessionCookie) to -1 and redirect the client to the IdP (OKTA ) logout endpoint which is</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;GET https://dev-267174.okta.com/oauth2/default/v1/logout?id_token_hint=${id_token}&lt;/code&gt;&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">GET https://dev-267174.okta.com/oauth2/default/v1/logout?id_token_hint=${id_token}</code></p>
 
-&lt;p&gt;Since we do not have the id_token to make this request because the id_token was give to AWS ALB, we cannot see this in browser also, AWS ALB internally gets the id_token and sets the session cookie.
-One way to overcome this is set short session timeout like 300 seconds in loadbalancer configuration. &lt;a href=&quot;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html#authentication-logout-timeout&quot;&gt;Refer here&lt;/a&gt;&lt;/p&gt;
+<p>Since we do not have the id_token to make this request because the id_token was give to AWS ALB, we cannot see this in browser also, AWS ALB internally gets the id_token and sets the session cookie.
+One way to overcome this is set short session timeout like 300 seconds in loadbalancer configuration. <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html#authentication-logout-timeout">Refer here</a></p>
 
-&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;/h2&gt;
+<h2 id="resources">Resources</h2>
 
-&lt;ol&gt;
-  &lt;li&gt;&lt;a href=&quot;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html&quot;&gt;https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://connect2id.com/learn/openid-connect&quot;&gt;https://connect2id.com/learn/openid-connect&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://developer.okta.com/docs/api/resources/oidc&quot;&gt;https://developer.okta.com/docs/api/resources/oidc&lt;/a&gt;&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="okta" /><category term="aws" /><summary type="html">Contents Introduction Assumptions Configuring OKTA Configuring AWS Application Load Balancer Shortcomings Resources</summary></entry><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T16:32:06+05:30</published><updated>2018-09-26T16:32:06+05:30</updated><id>https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3">&lt;p&gt;&lt;img src=&quot;/assets/images/tomcat-log-rotation.jpg&quot; alt=&quot;Tomcat Log Rotation&quot; /&gt;&lt;/p&gt;
+<ol>
+  <li><a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-authenticate-users.html</a></li>
+  <li><a href="https://connect2id.com/learn/openid-connect">https://connect2id.com/learn/openid-connect</a></li>
+  <li><a href="https://developer.okta.com/docs/api/resources/oidc">https://developer.okta.com/docs/api/resources/oidc</a></li>
+</ol>]]></content><author><name>Shreyas M M</name></author><category term="server" /><category term="aws" /><category term="cloud" /><category term="okta" /><category term="aws" /><summary type="html"><![CDATA[Authenticating AWS ELB with OKTA OIDC]]></summary></entry><entry><title type="html">Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3</title><link href="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3" rel="alternate" type="text/html" title="Tomcat Log Rotation, Compression, Encryption (GDPR Compliance) and Copy to AWS S3" /><published>2018-09-26T11:02:06+00:00</published><updated>2018-09-26T11:02:06+00:00</updated><id>https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3</id><content type="html" xml:base="https://www.shreyasmm.com/tomcat-log-rotation-compression-encryption-gdpr-compliance-and-copy-to-aws-s3"><![CDATA[<p><img src="/assets/images/tomcat-log-rotation.jpg" alt="Tomcat Log Rotation" /></p>
 
-&lt;p&gt;In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.&lt;/p&gt;
+<p>In production environment the logs of applications are important, we need to store them for compliance reasons and make sure that the log files dont fill up the disk space. Since the EU GDPR Privacy law has been passed, the log files need to be encrypted.</p>
 
-&lt;p&gt;In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/logrotate.d&lt;/code&gt;&lt;/p&gt;
+<p>In Linux we have a beautiful log management utility logrotate, which is run regularly to rotate the logs files of apt, dpkg, cups-daemon, rsyslog, ufw etc. configuration of these logs are found in <code class="language-plaintext highlighter-rouge">/etc/logrotate.d</code></p>
 
-&lt;p&gt;I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from &lt;a href=&quot;/&quot;&gt;here&lt;/a&gt;. Tomcat rotates the logs by itself in a default setup. which is configured in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/conf/logging.properties&lt;/code&gt; file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.&lt;/p&gt;
+<p>I am running Tomcat 9 and CATALINA_HOME=/opt/tomcat. You can install Tomcat 9 from <a href="/">here</a>. Tomcat rotates the logs by itself in a default setup. which is configured in <code class="language-plaintext highlighter-rouge">/opt/tomcat/conf/logging.properties</code> file. we need explicitly configure tomcat to not to rotate the log files like catalina.out itself, since we will be rotating and compressing them using system logrotate utility.</p>
 
-&lt;p&gt;Add this lines to &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/conf/logging.properties&lt;/code&gt;&lt;/p&gt;
+<p>Add this lines to <code class="language-plaintext highlighter-rouge">/opt/tomcat/conf/logging.properties</code></p>
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/f2579a891905442906167c7d77a99198.js&quot;&gt; &lt;/script&gt;
+<noscript><pre>400: Invalid request</pre></noscript>
+<script src="https://gist.github.com/f2579a891905442906167c7d77a99198.js"> </script>
 
-&lt;p&gt;I have added one line to each log entry &lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.juli.AsyncFileHandler.rotatable = false&lt;/code&gt; to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.&lt;/p&gt;
+<p>I have added one line to each log entry <code class="language-plaintext highlighter-rouge">org.apache.juli.AsyncFileHandler.rotatable = false</code> to stop rotation of logs by tomcat, Once this is done tomcat will not rotate the logs by itself.</p>
 
-&lt;h4 id=&quot;logrotate-and-compression&quot;&gt;Logrotate and Compression&lt;/h4&gt;
+<h4 id="logrotate-and-compression">Logrotate and Compression</h4>
 
-&lt;p&gt;create a new file at &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/logrotate.d/tomcat&lt;/code&gt;&lt;/p&gt;
+<p>create a new file at <code class="language-plaintext highlighter-rouge">/etc/logrotate.d/tomcat</code></p>
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js&quot;&gt; &lt;/script&gt;
+<noscript><pre>400: Invalid request</pre></noscript>
+<script src="https://gist.github.com/ec043a956c9d56580217f4824392ffc3.js"> </script>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;compress&lt;/code&gt; – compress the log files
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compresscmd&lt;/code&gt; – command used for Compression, gzip
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compressoptions&lt;/code&gt; – options for compression command, Gzip Compression level 1-9
-&lt;code class=&quot;highlighter-rouge&quot;&gt;compressext&lt;/code&gt; – extention of compressed file&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">compress</code> – compress the log files
+<code class="language-plaintext highlighter-rouge">compresscmd</code> – command used for Compression, gzip
+<code class="language-plaintext highlighter-rouge">compressoptions</code> – options for compression command, Gzip Compression level 1-9
+<code class="language-plaintext highlighter-rouge">compressext</code> – extention of compressed file</p>
 
-&lt;p&gt;its just going to do &lt;code class=&quot;highlighter-rouge&quot;&gt;gzip -9 filename&lt;/code&gt; , which compresses the file.&lt;/p&gt;
+<p>its just going to do <code class="language-plaintext highlighter-rouge">gzip -9 filename</code> , which compresses the file.</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;dateext&lt;/code&gt;
-&lt;code class=&quot;highlighter-rouge&quot;&gt;dateformat -%Y-%m-%d-%s&lt;/code&gt;
-these lines add date extention to the rotated log file in the format &lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.out-2018-09-21-1537501441&lt;/code&gt;&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">dateext</code>
+<code class="language-plaintext highlighter-rouge">dateformat -%Y-%m-%d-%s</code>
+these lines add date extention to the rotated log file in the format <code class="language-plaintext highlighter-rouge">catalina.out-2018-09-21-1537501441</code></p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nomail&lt;/code&gt; tells not mail the log files&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">nomail</code> tells not mail the log files</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;copytruncate&lt;/code&gt; – copies the log file to new file and truncates the log file to zero bytes.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">copytruncate</code> – copies the log file to new file and truncates the log file to zero bytes.</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;daily&lt;/code&gt; – rotates the log file daily&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">daily</code> – rotates the log file daily</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rotate 10&lt;/code&gt; – keep the 10 past rotated logs&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">rotate 10</code> – keep the 10 past rotated logs</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;notifempty&lt;/code&gt; – do not rotate the log if it is empty&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">notifempty</code> – do not rotate the log if it is empty</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;missingok&lt;/code&gt; – if the file is missing its ok&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">missingok</code> – if the file is missing its ok</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;create 0644 tomcat tomcat&lt;/code&gt; – create the log file with these permissions, ignored if copy truncate is used.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">create 0644 tomcat tomcat</code> – create the log file with these permissions, ignored if copy truncate is used.</p>
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;postrotate&lt;/code&gt; – command to run after the log rotation.&lt;/p&gt;
+<p><code class="language-plaintext highlighter-rouge">postrotate</code> – command to run after the log rotation.</p>
 
-&lt;p&gt;Here we are running the a custom Bash command to encrypt and move the log files to AWS S3&lt;/p&gt;
+<p>Here we are running the a custom Bash command to encrypt and move the log files to AWS S3</p>
 
-&lt;h4 id=&quot;encryption-and-copying-to-aws-s3&quot;&gt;Encryption and Copying to AWS S3&lt;/h4&gt;
+<h4 id="encryption-and-copying-to-aws-s3">Encryption and Copying to AWS S3</h4>
 
-&lt;p&gt;Create a Bash Shell Script &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /usr/share/encrypt&lt;/code&gt;&lt;/p&gt;
+<p>Create a Bash Shell Script <code class="language-plaintext highlighter-rouge">vim /usr/share/encrypt</code></p>
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js&quot;&gt; &lt;/script&gt;
+<noscript><pre>400: Invalid request</pre></noscript>
+<script src="https://gist.github.com/64dac1afc1274878e1aa9a3ce1fac6ef.js"> </script>
 
-&lt;p&gt;Give it execute permissions&lt;/p&gt;
+<p>Give it execute permissions</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x /usr/share/encrypt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x /usr/share/encrypt
+</code></pre></div></div>
 
-&lt;p&gt;This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key&lt;/p&gt;
+<p>This script will encrypt the file with .gz which are compressed files and accept the two arguments location of gz files and Encryption key</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;encrypt /opt/tomcat/log /data/key
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>encrypt /opt/tomcat/log /data/key
+</code></pre></div></div>
 
-&lt;p&gt;Key is needed to encrypt and decrypt the file&lt;/p&gt;
+<p>Key is needed to encrypt and decrypt the file</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /data/key
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /data/key
 Big3secret
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.&lt;/p&gt;
+<p>Encrypt command will get list of files in given location and if the file has .gz extention the it will encrypt it with gpg (GNU Privacy Guard), move all the encrypted files which has .gpg extention to aws s3 bucket and once uploaded it will delete the encrypted file from that location. For copying the encrypted logs to S3 make sure that the ec2 instance has write to S3 IAM Access Role assigned to it.</p>
 
-&lt;p&gt;For Decryption of files&lt;/p&gt;
+<p>For Decryption of files</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gpg &lt;span class=&quot;nt&quot;&gt;--batch&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--passphrase-file&lt;/span&gt; /data/mykey &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz.gpg &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; catalina.out-2018-09-21-1537501441.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="https://www.shreyasmm.com/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T16:32:06+05:30</published><updated>2018-09-25T16:32:06+05:30</updated><id>https://www.shreyasmm.com/how-to-install-tomcat</id><content type="html" xml:base="https://www.shreyasmm.com/how-to-install-tomcat">&lt;p&gt;&lt;img src=&quot;/assets/images/install-tomcat.jpg&quot; alt=&quot;How to Install Tomcat&quot; /&gt;&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gpg <span class="nt">--batch</span> <span class="nt">--passphrase-file</span> /data/mykey <span class="nt">-d</span> catalina.out-2018-09-21-1537501441.gz.gpg <span class="o">&gt;</span> catalina.out-2018-09-21-1537501441.gz
+</code></pre></div></div>]]></content><author><name>Shreyas M M</name></author><category term="server" /><category term="aws" /><category term="cloud" /><category term="gdpr" /><category term="linux" /><category term="logrotation" /><category term="tomcat" /><summary type="html"><![CDATA[Tomcat server log rotation and encrypting logs, copying logs to AWS S3.]]></summary></entry><entry><title type="html">How to Install Tomcat</title><link href="https://www.shreyasmm.com/how-to-install-tomcat" rel="alternate" type="text/html" title="How to Install Tomcat" /><published>2018-09-25T11:02:06+00:00</published><updated>2018-09-25T11:02:06+00:00</updated><id>https://www.shreyasmm.com/how-to-install-tomcat</id><content type="html" xml:base="https://www.shreyasmm.com/how-to-install-tomcat"><![CDATA[<p><img src="/assets/images/install-tomcat.jpg" alt="How to Install Tomcat" /></p>
 
-&lt;p&gt;Tomcat is web server and servlet container which is used to run java applications, i will be showing the steps to install tomcat and java in an production system. i will be installing Tomcat 9 and OpenJDK 1.8 (Java 8). Most Steps are common for Redhat and Debian based systems.&lt;/p&gt;
+<p>Tomcat is web server and servlet container which is used to run java applications, i will be showing the steps to install tomcat and java in an production system. i will be installing Tomcat 9 and OpenJDK 1.8 (Java 8). Most Steps are common for Redhat and Debian based systems.</p>
 
-&lt;h4 id=&quot;java-8-installation&quot;&gt;Java 8 Installation&lt;/h4&gt;
+<h4 id="java-8-installation">Java 8 Installation</h4>
 
-&lt;p&gt;For Redhat based Distribution&lt;/p&gt;
+<p>For Redhat based Distribution</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum <span class="nb">install </span>java-1.8.0-openjdk.x86_64 java-1.8.0-openjdk-devel.x86_64
+</code></pre></div></div>
 
-&lt;p&gt;For Debian and Ubuntu based Distribution&lt;/p&gt;
+<p>For Debian and Ubuntu based Distribution</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;openjdk-8-jdk
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt <span class="nb">install </span>openjdk-8-jdk
+</code></pre></div></div>
 
-&lt;p&gt;Get the Java Installed Version&lt;/p&gt;
+<p>Get the Java Installed Version</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;java &lt;span class=&quot;nt&quot;&gt;-version&lt;/span&gt;
-openjdk version &lt;span class=&quot;s2&quot;&gt;&quot;1.8.0_181&quot;&lt;/span&gt;
-OpenJDK Runtime Environment &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;build 1.8.0_181-b13&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-OpenJDK 64-Bit Server VM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;build 25.181-b13, mixed mode&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java <span class="nt">-version</span>
+openjdk version <span class="s2">"1.8.0_181"</span>
+OpenJDK Runtime Environment <span class="o">(</span>build 1.8.0_181-b13<span class="o">)</span>
+OpenJDK 64-Bit Server VM <span class="o">(</span>build 25.181-b13, mixed mode<span class="o">)</span>
+</code></pre></div></div>
 
-&lt;p&gt;We need to set JAVA_HOME environment variable so run and get the JAVA_HOME Path&lt;/p&gt;
+<p>We need to set JAVA_HOME environment variable so run and get the JAVA_HOME Path</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;update-alternatives &lt;span class=&quot;nt&quot;&gt;--config&lt;/span&gt; java
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>update-alternatives <span class="nt">--config</span> java
+</code></pre></div></div>
 
-&lt;p&gt;Edit file &lt;code class=&quot;highlighter-rouge&quot;&gt;vim /etc/environment&lt;/code&gt; add JAVA_HOME environment variable&lt;/p&gt;
+<p>Edit file <code class="language-plaintext highlighter-rouge">vim /etc/environment</code> add JAVA_HOME environment variable</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;JAVA_HOME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.el7_2.x86_64/jre&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">JAVA_HOME</span><span class="o">=</span><span class="s2">"/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.111-1.b15.el7_2.x86_64/jre"</span>
+</code></pre></div></div>
 
-&lt;p&gt;Logout and Login, run &lt;code class=&quot;highlighter-rouge&quot;&gt;env&lt;/code&gt;, Check for JAVA_HOME in the output.&lt;/p&gt;
+<p>Logout and Login, run <code class="language-plaintext highlighter-rouge">env</code>, Check for JAVA_HOME in the output.</p>
 
-&lt;h4 id=&quot;tomcat-9-installation&quot;&gt;Tomcat 9 Installation&lt;/h4&gt;
+<h4 id="tomcat-9-installation">Tomcat 9 Installation</h4>
 
-&lt;p&gt;Create a tomcat group&lt;/p&gt;
+<p>Create a tomcat group</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;groupadd tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>groupadd tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Create a tomcat user with /opt/tomcat as its home directory&lt;/p&gt;
+<p>Create a tomcat user with /opt/tomcat as its home directory</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /opt/tomcat
-useradd &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; /bin/false &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; tomcat &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; /opt/tomcat tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> /opt/tomcat
+useradd <span class="nt">-s</span> /bin/false <span class="nt">-g</span> tomcat <span class="nt">-d</span> /opt/tomcat tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Change working directory and download the latest tomcat from &lt;a href=&quot;https://tomcat.apache.org&quot;&gt;tomcat website&lt;/a&gt;&lt;/p&gt;
+<p>Change working directory and download the latest tomcat from <a href="https://tomcat.apache.org">tomcat website</a></p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; /opt
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> /opt
 wget http://mirrors.wuchna.com/apachemirror/tomcat/tomcat-9/v9.0.12/bin/apache-tomcat-9.0.12.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Extract the Tomcat archive&lt;/p&gt;
+<p>Extract the Tomcat archive</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;tar&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-xzvf&lt;/span&gt; apache-tomcat-9.0.12.tar.gz
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tar</span> <span class="nt">-xzvf</span> apache-tomcat-9.0.12.tar.gz
+</code></pre></div></div>
 
-&lt;p&gt;Move Contents to &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt;&lt;/p&gt;
+<p>Move Contents to <code class="language-plaintext highlighter-rouge">/opt/tomcat</code></p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mv &lt;/span&gt;apache-tomcat/&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mv </span>apache-tomcat/<span class="k">*</span> /opt/tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Change ownership and user to tomcat&lt;/p&gt;
+<p>Change ownership and user to tomcat</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; tomcat:tomcat /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chown</span> <span class="nt">-R</span> tomcat:tomcat /opt/tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Create Systemd Service for Tomcat Service&lt;/p&gt;
+<p>Create Systemd Service for Tomcat Service</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /etc/systemd/system/tomcat.service
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /etc/systemd/system/tomcat.service
+</code></pre></div></div>
 
-&lt;noscript&gt;&lt;pre&gt;400: Invalid request
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/a3b4986605aa6c2a0b930ac11ada8ae0.js&quot;&gt; &lt;/script&gt;
+<noscript><pre>400: Invalid request</pre></noscript>
+<script src="https://gist.github.com/a3b4986605aa6c2a0b930ac11ada8ae0.js"> </script>
 
-&lt;p&gt;Reload systemd manager configuration.&lt;/p&gt;
+<p>Reload systemd manager configuration.</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl daemon-reload
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl daemon-reload
+</code></pre></div></div>
 
-&lt;p&gt;Start Tomcat Process.&lt;/p&gt;
+<p>Start Tomcat Process.</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl start tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl start tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Enable Tomcat to Start at System Boot.&lt;/p&gt;
+<p>Enable Tomcat to Start at System Boot.</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl <span class="nb">enable </span>tomcat
+</code></pre></div></div>
 
-&lt;p&gt;Run &lt;code class=&quot;highlighter-rouge&quot;&gt;netstat -plntu&lt;/code&gt; and check port 8080 is in LISTEN State by a java program. Now open &lt;code class=&quot;highlighter-rouge&quot;&gt;http://server-ip-addres:8080&lt;/code&gt; you should see tomcat homepage&lt;/p&gt;
+<p>Run <code class="language-plaintext highlighter-rouge">netstat -plntu</code> and check port 8080 is in LISTEN State by a java program. Now open <code class="language-plaintext highlighter-rouge">http://server-ip-addres:8080</code> you should see tomcat homepage</p>
 
-&lt;p&gt;Configure Tomcat Manager Users&lt;/p&gt;
+<p>Configure Tomcat Manager Users</p>
 
-&lt;noscript&gt;&lt;pre&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;head&amp;gt;
-    &amp;lt;meta http-equiv=&amp;quot;Content-type&amp;quot; content=&amp;quot;text/html; charset=utf-8&amp;quot;&amp;gt;
-    &amp;lt;meta http-equiv=&amp;quot;Content-Security-Policy&amp;quot; content=&amp;quot;default-src &amp;#39;none&amp;#39;; style-src &amp;#39;unsafe-inline&amp;#39;; img-src data:; connect-src &amp;#39;self&amp;#39;&amp;quot;&amp;gt;
-    &amp;lt;title&amp;gt;Site not found &amp;amp;middot; GitHub Pages&amp;lt;/title&amp;gt;
-    &amp;lt;style type=&amp;quot;text/css&amp;quot; media=&amp;quot;screen&amp;quot;&amp;gt;
-      body {
-        background-color: #f1f1f1;
-        margin: 0;
-        font-family: &amp;quot;Helvetica Neue&amp;quot;, Helvetica, Arial, sans-serif;
-      }
+<noscript><pre>400: Invalid request</pre></noscript>
+<script src="https://gist.github.com/8654a629ec28798e944cf36eff9985c5.js"> </script>
 
-      .container { margin: 50px auto 40px auto; width: 600px; text-align: center; }
+<p>Restart Tomcat Process.</p>
 
-      a { color: #4183c4; text-decoration: none; }
-      a:hover { text-decoration: underline; }
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart tomcat
+</code></pre></div></div>
 
-      h1 { width: 800px; position:relative; left: -100px; letter-spacing: -1px; line-height: 60px; font-size: 60px; font-weight: 100; margin: 0px 0 50px 0; text-shadow: 0 1px 0 #fff; }
-      p { color: rgba(0, 0, 0, 0.5); margin: 20px 0; line-height: 1.6; }
+<p>Make sure all the Files in <code class="language-plaintext highlighter-rouge">/opt/tomcat</code> belong to Tomcat user and group, Run this Command whenever you new deploy WAR in <code class="language-plaintext highlighter-rouge">/opt/tomcat/webapps</code></p>
 
-      ul { list-style: none; margin: 25px 0; padding: 0; }
-      li { display: table-cell; font-weight: bold; width: 1%; }
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chown</span> <span class="nt">-R</span> tomcat:tomcat /opt/tomcat
+</code></pre></div></div>]]></content><author><name>Shreyas M M</name></author><category term="server" /><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"><![CDATA[Installing Java, Tomcat and Tomcat server configuration.]]></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="https://www.shreyasmm.com/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T11:02:06+00:00</published><updated>2017-03-19T11:02:06+00:00</updated><id>https://www.shreyasmm.com/install-nodejs-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-nodejs-ubuntu"><![CDATA[<p><img src="/assets/images/how-to-install-nodejs.jpg" alt="How to Install Nodejs on Ubuntu" class=".center" /></p>
 
-      .logo { display: inline-block; margin-top: 35px; }
-      .logo-img-2x { display: none; }
-      @media
-      only screen and (-webkit-min-device-pixel-ratio: 2),
-      only screen and (   min--moz-device-pixel-ratio: 2),
-      only screen and (     -o-min-device-pixel-ratio: 2/1),
-      only screen and (        min-device-pixel-ratio: 2),
-      only screen and (                min-resolution: 192dpi),
-      only screen and (                min-resolution: 2dppx) {
-        .logo-img-1x { display: none; }
-        .logo-img-2x { display: inline-block; }
-      }
+<p>Today I am going to show How to install <a href="https://nodejs.org">nodejs</a> on your ubuntu machine of any version, you can install multiple versions of nodejs at same time using nvm.</p>
 
-      #suggestions {
-        margin-top: 35px;
-        color: #ccc;
-      }
-      #suggestions a {
-        color: #666666;
-        font-weight: 200;
-        font-size: 14px;
-        margin: 0 10px;
-      }
+<h4 id="nvm--node-version-manager"><a href="https://github.com/creationix/nvm">NVM – Node Version Manager</a></h4>
 
-    &amp;lt;/style&amp;gt;
-  &amp;lt;/head&amp;gt;
-  &amp;lt;body&amp;gt;
+<p>nvm is to node what rbenv is to ruby, nvm helps us to use multiple versions of node on project level and over all system wide level, We will be using nvm to install because ubuntu does not have latest version of node. This is the easiest method of all and to stay updated on latest release of node, lets install nvm</p>
 
-    &amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/creationix/nvm.git .nvm
+</code></pre></div></div>
 
-      &amp;lt;h1&amp;gt;404&amp;lt;/h1&amp;gt;
-      &amp;lt;p&amp;gt;&amp;lt;strong&amp;gt;There isn&amp;#39;t a GitHub Pages site here.&amp;lt;/strong&amp;gt;&amp;lt;/p&amp;gt;
+<p>Now we need to source the nvm directory and nvm.sh to the shell, Add below lines to your <code class="language-plaintext highlighter-rouge">~/.bashrc</code>, <code class="language-plaintext highlighter-rouge">~/.profile</code>, or <code class="language-plaintext highlighter-rouge">~/.zshrc</code> based on the shell you use, so that the command will be available on you login</p>
 
-      &amp;lt;p&amp;gt;
-        If you&amp;#39;re trying to publish one,
-        &amp;lt;a href=&amp;quot;https://help.github.com/pages/&amp;quot;&amp;gt;read the full documentation&amp;lt;/a&amp;gt;
-        to learn how to set up &amp;lt;strong&amp;gt;GitHub Pages&amp;lt;/strong&amp;gt;
-        for your repository, organization, or user account.
-      &amp;lt;/p&amp;gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">NVM_DIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.nvm"</span>
+<span class="o">[</span> <span class="nt">-s</span> <span class="s2">"</span><span class="nv">$NVM_DIR</span><span class="s2">/nvm.sh"</span> <span class="o">]</span> <span class="o">&amp;&amp;</span> <span class="nb">.</span> <span class="s2">"</span><span class="nv">$NVM_DIR</span><span class="s2">/nvm.sh"</span>
+</code></pre></div></div>
 
-      &amp;lt;div id=&amp;quot;suggestions&amp;quot;&amp;gt;
-        &amp;lt;a href=&amp;quot;https://githubstatus.com&amp;quot;&amp;gt;GitHub Status&amp;lt;/a&amp;gt; &amp;amp;mdash;
-        &amp;lt;a href=&amp;quot;https://twitter.com/githubstatus&amp;quot;&amp;gt;@githubstatus&amp;lt;/a&amp;gt;
-      &amp;lt;/div&amp;gt;
+<p>Now get the list of available versions of nodejs</p>
 
-      &amp;lt;a href=&amp;quot;/&amp;quot; class=&amp;quot;logo logo-img-1x&amp;quot;&amp;gt;
-        &amp;lt;img width=&amp;quot;32&amp;quot; height=&amp;quot;32&amp;quot; title=&amp;quot;&amp;quot; alt=&amp;quot;&amp;quot; src=&amp;quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpFMTZCRDY3REIzRjAxMUUyQUQzREIxQzRENUFFNUM5NiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpFMTZCRDY3RUIzRjAxMUUyQUQzREIxQzRENUFFNUM5NiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkUxNkJENjdCQjNGMDExRTJBRDNEQjFDNEQ1QUU1Qzk2IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkUxNkJENjdDQjNGMDExRTJBRDNEQjFDNEQ1QUU1Qzk2Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+SM9MCAAAA+5JREFUeNrEV11Ik1EY3s4+ddOp29Q5b0opCgKFsoKoi5Kg6CIhuwi6zLJLoYLopq4qsKKgi4i6CYIoU/q5iDAKs6syoS76IRWtyJ+p7cdt7sf1PGOD+e0c3dygAx/67ZzzPM95/877GYdHRg3ZjMXFxepQKNS6sLCwJxqNNuFpiMfjVs4ZjUa/pmmjeD6VlJS8NpvNT4QQ7mxwjSsJiEQim/1+/9lgMHgIr5ohuxG1WCw9Vqv1clFR0dCqBODElV6v90ogEDjGdYbVjXhpaendioqK07CIR7ZAqE49PT09BPL2PMgTByQGsYiZlQD4uMXtdr+JxWINhgINYhGT2MsKgMrm2dnZXgRXhaHAg5jEJodUAHxux4LudHJE9RdEdA+i3Juz7bGHe4mhE9FNrgwBCLirMFV9Okh5eflFh8PR5nK5nDabrR2BNJlKO0T35+Li4n4+/J+/JQCxhmu5h3uJoXNHPbmWZAHMshWB8l5/ipqammaAf0zPDDx1ONV3vurdidqwAQL+pEc8sLcAe1CCvQ3YHxIW8Pl85xSWNC1hADDIv0rIE/o4J0k3kww4xSlwIhcq3EFFOm7KN/hUGOQkt0CFa5WpNJlMvxBEz/IVQAxg/ZRZl9wiHA63yDYieM7DnLP5CiAGsC7I5sgtYKJGWe2A8seFqgFJrJjEPY1Cn3pJ8/9W1e5VWsFDTEmFrBcoDhZJEQkXuhICMyKpjhahqN21hRYATKfUOlDmkygrR4o4C0VOLGJKrOITKB4jijzdXygBKixyC5TDQdnk/Pz8qRw6oOWGlsTKGOQW6OH6FBWsyePxdOXLTgxiyebILZCjz+GLgMIKnXNzc49YMlcRdHXcSwxFVgTInQhC9G33UhNoJLuqq6t345p9y3eUy8OTk5PjAHuI9uo4b07FBaOhsu0A4Unc+T1TU1Nj3KsSSE5yJ65jqF2DDd8QqWYmAZrIM2VlZTdnZmb6AbpdV9V6ec9znf5Q7HjYumdRE0JOp3MjitO4SFa+cZz8Umqe3TCbSLvdfkR/kWDdNQl5InuTcysOcpFT35ZrbBxx4p3JAHlZVVW1D/634VRt+FvLBgK/v5LV9WS+10xMTEwtRw7XvqOL+e2Q8V3AYIOIAXQ26/heWVnZCVfcyKHg2CBgTpmPmjYM8l24GyaUHyaIh7XwfR9ErE8qHoDfn2LTNAVC0HX6MFcBIP8Bi+6F6cdW/DICkANRfx99fEYFQ7Nph5i/uQiA214gno7K+guhaiKg9gC62+M8eR7XsBsYJ4ilam60Fb7r7uAj8wFyuwM1oIOWgfmDy6RXEEQzJMPe23DXrVS7rtyD3Df8z/FPgAEAzWU5Ku59ZAUAAAAASUVORK5CYII=&amp;quot;&amp;gt;
-      &amp;lt;/a&amp;gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nvm ls-remote
+</code></pre></div></div>
 
-      &amp;lt;a href=&amp;quot;/&amp;quot; class=&amp;quot;logo logo-img-2x&amp;quot;&amp;gt;
-        &amp;lt;img width=&amp;quot;32&amp;quot; height=&amp;quot;32&amp;quot; title=&amp;quot;&amp;quot; alt=&amp;quot;&amp;quot; src=&amp;quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyRpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoTWFjaW50b3NoKSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpEQUM1QkUxRUI0MUMxMUUyQUQzREIxQzRENUFFNUM5NiIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpEQUM1QkUxRkI0MUMxMUUyQUQzREIxQzRENUFFNUM5NiI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkUxNkJENjdGQjNGMDExRTJBRDNEQjFDNEQ1QUU1Qzk2IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkUxNkJENjgwQjNGMDExRTJBRDNEQjFDNEQ1QUU1Qzk2Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+hfPRaQAAB6lJREFUeNrsW2mME2UYbodtt+2222u35QheoCCYGBQligIJgkZJNPzgigoaTEj8AdFEMfADfyABkgWiiWcieK4S+QOiHAYUj2hMNKgYlEujpNttu9vttbvdw+chU1K6M535pt3ubHCSyezR+b73eb73+t7vrfXsufOW4bz6+vom9/b23ovnNNw34b5xYGAgODg46Mbt4mesVmsWd1qSpHhdXd2fuP/Afcput5/A88xwymcdBgLqenp6FuRyuWV4zu/v759QyWBjxoz5t76+/gun09mK5xFyakoCAPSaTCazNpvNPoYVbh6O1YKGRF0u13sNDQ27QMzfpiAAKj0lnU6/gBVfAZW2WWpwwVzy0IgP3G73FpjI6REhAGA9qVRqA1b9mVoBVyIC2tDi8Xg24+dUzQiAbS/s7Ox8G2o/3mKCC+Zw0efzPQEfcVjYrARX3dbV1bUtHo8fMgt42f+Mp0yUTVQbdWsAHVsikdiHkHaPxcQXQufXgUBgMRxme9U0AAxfH4vFvjM7eF6UkbJS5qoQwEQGA57Ac5JllFyUVZZ5ckUEgMVxsK2jlSYzI+QXJsiyjzNEAJyJAzb/KQa41jJKL8pODMQiTEAymXw5n8/P0IjD3bh7Rgog59aanxiIRTVvV/oj0tnHca/WMrVwODwB3raTGxzkBg/gnZVapFV62Wy2n5AO70HM/5wbJ0QnXyQSaVPDIuNZzY0V3ntHMwxiwHA0Gj2Np7ecIBDgaDAYXKCQJM1DhrgJ3nhulcPbl8j4NmHe46X/g60fwbz3aewjkqFQaAqebWU1AOqyQwt8Id6qEHMc97zu7u7FGGsn7HAiVuosVw7P35C1nccdgSCxop1dHeZswmfHMnxBo6ZTk+jN8dl/vF7vWofDsa+MLN9oEUBMxOb3+1eoEsBVw6Zmua49r8YmhAKDiEPcMwBsxMiqQ+ixzPFxZyqRpXARG/YOr1ObFJ0gUskXBbamcR1OKmMUvDxHRAu8/LmY3jFLMUpFqz9HxG65smYJdyKyECOxDiEAe/p1gjF2oonivZAsxVgl2daa4EQWCW6J55qFAFFZiJWYLxNQy2qOSUzGRsyXCUDIeliwAHEO4WSlWQBRFoZakXcKmCXmyXAKs0Ve9vl8q42WoIYpJU4hV3hKcNs8m9gl7p/xQ73eF5kB4j5mNrWmTJRNwAzqiV1CxjVTZCIkEq+Z1bZFZSN2CenmVAFVy4Plz8xKAGWjjAKFk6lCBMDR/MJjLLMSQNm43xAiQKTaA+9/wewhDjL+JVI1kkTSSOTcKbMTwPqESAot6dn6Fr1gHwVJju6IRuyiByPuUUBAg5DGkAgBmxlvdgIEK9gDkohdY/BJo4CAG0R8miRSsGABkgVQs4KXu098IgUXSSRsFAoKZiVAVDY2WUiiPTjYRi41KwGisrGsLtlsth8Fiwnz2fBkQvWfRtlE3iF2yW63/yCacXZ1dW02GwGyTFaRd4idJnCKHRaCxYRHoG5LTKT6SyiToP1fJHbmAYPYRR0UnZQtMnA6s0zg+GZBlt0Gdo7EPHgpE3Q6nZ8YyLhc8Xj8MJh/aKTAY+5FPAKHLE7RdwuYJZmNwzyCMkBCYyKROJBMJl9B/PXXCjjmCmDOVzH3fiPpObEWGqoKe4EBl8v1hlqsdLvd23mkxHM9pc9kMpmno9HoeTii7ewbHEZPPx1ztLS1tV3AnGuMjiNjvbQFuHw6zDo5By7dTPAQNBgMLrRarTkSls1mnwT7uwp9virx9QzbW/HuV/j5d/b+6jniKlllP8lkeONJDk+dq9GsQTnC4fB1heO0K47Hwe7WdDr9nAKgXwOBwHI+C45Htj1d6sd429TUNEcmUdc+PRaLHcvn87dXW4ugzdsaGxufL94NFv9zi1J7GVbhlvb2dnaJ3SVrxfc+n2+NTsZ7/H7/Mr3g5XdSIHyJSH1PZ+7fToyl2+ErqilgZ4NaLYB9goVGaHjR93Hv1ZrU4XDsFT20kH3PObzbWk0CgG1jacVIUnAQb9F+VexyLMzkpcLv0IJV7AHQIOCAUYHx7v5qgScmYHtTqSAyZLEJTK22Bie4iq3xsqpm4SAf9Hq9a2DnJ4uLK3SEULcdRvp3i3zHySqpficxEdsQc1NrlYXXvR+O7qASSezXB+h1SuUomgg9LL8BUoV4749EIolKh+EiqWmqVEZlDgHks2pxHw7xTqUQw9J5NcAXOK10AGIoZ6Zli6JY6Z1Q461KoZ4NiKLHarW+KDsxlDUPHZ5zPQZqUVDPJsTqb5n9malbpAh8C2XXDLl62+WZIDFRUlNVOiwencnNU3aQEkL+cDMSoLvZo2fQB7AJssNAuFuvorlDVVkkg2I87+jo2K2QAVphDrfyViK5VqtO34OkaxXCp+7drdDBCAdubm6eidX+2WwqT5komwh4YQLk+H4aE93h8Xg2gvHekQZOGSgLZTLyDTLJ4Lx9/KZWKBSainT4Iy3FqQBfnUZR42PKQFksBr9QKVXCPusD3OiA/RkQ5kP8qV/Jl1WywAp/6+dcmPM2zL1UrUahe4JqfnWWKXIul3uUbfP8njAFLW1OFr3gdFtZ72cNH+PtQT7/brW+NXqJAHh0y9V8/U/A1U7AfwIMAD7mS3pCbuWJAAAAAElFTkSuQmCC&amp;quot;&amp;gt;
-      &amp;lt;/a&amp;gt;
-    &amp;lt;/div&amp;gt;
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/pre&gt;&lt;/noscript&gt;
-&lt;script src=&quot;https://gist.github.com/8654a629ec28798e944cf36eff9985c5.js&quot;&gt; &lt;/script&gt;
+<p>Based on your requirement, install the node version i will go for LTS version</p>
 
-&lt;p&gt;Restart Tomcat Process.&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nvm <span class="nb">install </span>v6.10.0
+</code></pre></div></div>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl restart tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<p>Set this version as default</p>
 
-&lt;p&gt;Make sure all the Files in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt; belong to Tomcat user and group, Run this Command whenever you new deploy WAR in &lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat/webapps&lt;/code&gt;&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nvm <span class="nb">alias </span>default v6.10.0
+</code></pre></div></div>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; tomcat:tomcat /opt/tomcat
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="linux" /><category term="tomcat" /><summary type="html"></summary></entry><entry><title type="html">How to Install Nodejs on Ubuntu</title><link href="https://www.shreyasmm.com/install-nodejs-ubuntu" rel="alternate" type="text/html" title="How to Install Nodejs on Ubuntu" /><published>2017-03-19T16:32:06+05:30</published><updated>2017-03-19T16:32:06+05:30</updated><id>https://www.shreyasmm.com/install-nodejs-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-nodejs-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/how-to-install-nodejs.jpg&quot; alt=&quot;How to Install Nodejs on Ubuntu&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+<p>Now Nodejs is installed</p>
 
-&lt;p&gt;Today I am going to show How to install &lt;a href=&quot;https://nodejs.org&quot;&gt;nodejs&lt;/a&gt; on your ubuntu machine of any version, you can install multiple versions of nodejs at same time using nvm.&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node <span class="nt">--version</span>
+</code></pre></div></div>
 
-&lt;h4 id=&quot;nvm--node-version-manager&quot;&gt;&lt;a href=&quot;https://github.com/creationix/nvm&quot;&gt;NVM – Node Version Manager&lt;/a&gt;&lt;/h4&gt;
+<p>You also have access to npm (Node Package Manager) you can get many node packages with single command lets check its version</p>
 
-&lt;p&gt;nvm is to node what rbenv is to ruby, nvm helps us to use multiple versions of node on project level and over all system wide level, We will be using nvm to install because ubuntu does not have latest version of node. This is the easiest method of all and to stay updated on latest release of node, lets install nvm&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nt">--version</span>
+</code></pre></div></div>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/creationix/nvm.git .nvm
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<p>Now suppose any of your project depends on older version of node then run this in specific project directory</p>
 
-&lt;p&gt;Now we need to source the nvm directory and nvm.sh to the shell, Add below lines to your &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.bashrc&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.profile&lt;/code&gt;, or &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.zshrc&lt;/code&gt; based on the shell you use, so that the command will be available on you login&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;NVM_DIR&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/.nvm&quot;&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$NVM_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/nvm.sh&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$NVM_DIR&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/nvm.sh&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now get the list of available versions of nodejs&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm ls-remote
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Based on your requirement, install the node version i will go for LTS version&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;v6.10.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Set this version as default&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;nvm &lt;span class=&quot;nb&quot;&gt;alias &lt;/span&gt;default v6.10.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now Nodejs is installed&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;node &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You also have access to npm (Node Package Manager) you can get many node packages with single command lets check its version&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;npm &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now suppose any of your project depends on older version of node then run this in specific project directory&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;4.8.0&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; .nvmrc
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s2">"4.8.0"</span> <span class="o">&gt;</span> .nvmrc
 nvm use
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="nodejs" /><category term="nvm" /><summary type="html"></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="https://www.shreyasmm.com/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T16:32:06+05:30</published><updated>2016-09-12T16:32:06+05:30</updated><id>https://www.shreyasmm.com/i-just-cleared-rhce</id><content type="html" xml:base="https://www.shreyasmm.com/i-just-cleared-rhce">&lt;p&gt;&lt;img src=&quot;/assets/images/rhce.jpg&quot; alt=&quot;RHCE Logo&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+</code></pre></div></div>]]></content><author><name>Shreyas M M</name></author><category term="ubuntu" /><category term="nodejs" /><category term="nvm" /><summary type="html"><![CDATA[Install nodejs on ubuntu using nvm the most easiest way and to stay updated on latest release of nodejs.]]></summary></entry><entry><title type="html">I Just Cleared RHCE</title><link href="https://www.shreyasmm.com/i-just-cleared-rhce" rel="alternate" type="text/html" title="I Just Cleared RHCE" /><published>2016-09-12T11:02:06+00:00</published><updated>2016-09-12T11:02:06+00:00</updated><id>https://www.shreyasmm.com/i-just-cleared-rhce</id><content type="html" xml:base="https://www.shreyasmm.com/i-just-cleared-rhce"><![CDATA[<p><img src="/assets/images/rhce.jpg" alt="RHCE Logo" class=".center" /></p>
 
-&lt;p&gt;After Two months preparation i finally cleared RHCE, on 27 Aug 2016 i received a mail saying congratulation on earning RHCE. the whole week was bliss, well i had cleared RHCSA with 300/300, RHCE with 271/300. I have done my RHCE on Red Hat Enterprise Linux 7.&lt;/p&gt;
+<p>After Two months preparation i finally cleared RHCE, on 27 Aug 2016 i received a mail saying congratulation on earning RHCE. the whole week was bliss, well i had cleared RHCSA with 300/300, RHCE with 271/300. I have done my RHCE on Red Hat Enterprise Linux 7.</p>
 
-&lt;p&gt;RHCSA is very easy it involves many basic Linux things RHCE is more advanced you can get more details on exams &amp;amp; course contents &lt;a href=&quot;https://www.redhat.com/en/services/certification/rhcsa&quot;&gt;RHCSA&lt;/a&gt; and &lt;a href=&quot;https://www.redhat.com/en/services/certification/rhce&quot;&gt;RHCE&lt;/a&gt;&lt;/p&gt;
+<p>RHCSA is very easy it involves many basic Linux things RHCE is more advanced you can get more details on exams &amp; course contents <a href="https://www.redhat.com/en/services/certification/rhcsa">RHCSA</a> and <a href="https://www.redhat.com/en/services/certification/rhce">RHCE</a></p>
 
-&lt;h4 id=&quot;some-tips-on-how-to-clear-the-rhce&quot;&gt;Some tips on how to clear the RHCE&lt;/h4&gt;
+<h4 id="some-tips-on-how-to-clear-the-rhce">Some tips on how to clear the RHCE</h4>
 
-&lt;ol&gt;
-  &lt;li&gt;Time management is very important and crucial when concentrating on RHCE.&lt;/li&gt;
-  &lt;li&gt;Even though you may know how to solve the question if you take more time in solving that problem its not worth you would have wasted more time in it instead you would have solved more small questions in it.&lt;/li&gt;
-  &lt;li&gt;Rather than working in GUI try working more in terminal you will definitely save time and use ssh when you want to execute on commands on systems.&lt;/li&gt;
-  &lt;li&gt;When practising keep note of time, you are taking to solve the problem this will help you a lot and give you a confidence exam is of 3 and half hours , you may get last half an hour for solving.&lt;/li&gt;
-  &lt;li&gt;When preparing i used books provided by redhat concentrate on concepts and solve the examples given in the books.&lt;/li&gt;
-  &lt;li&gt;Everything is in man pages, examples on important things like teaming,etc are provided in the man pages you can easily get reference from there for faster execution&lt;/li&gt;
-  &lt;li&gt;If you got struck in any question leave it go for next at the end when you have time try solving it, don’t take more than 10 mins solving a question&lt;/li&gt;
-  &lt;li&gt;Enable all the required firewall ports once, install all the packages at once in the beginning, you will definitely save a huge amount of time in this&lt;/li&gt;
-  &lt;li&gt;Restart after every entry in /etc/fstab to check you have done correctly. At the end don’t forget to restart you systems.&lt;/li&gt;
-  &lt;li&gt;Write down important things in the paper provided to you in exam it will save time when working &amp;amp; checking.&lt;/li&gt;
-&lt;/ol&gt;
+<ol>
+  <li>Time management is very important and crucial when concentrating on RHCE.</li>
+  <li>Even though you may know how to solve the question if you take more time in solving that problem its not worth you would have wasted more time in it instead you would have solved more small questions in it.</li>
+  <li>Rather than working in GUI try working more in terminal you will definitely save time and use ssh when you want to execute on commands on systems.</li>
+  <li>When practising keep note of time, you are taking to solve the problem this will help you a lot and give you a confidence exam is of 3 and half hours , you may get last half an hour for solving.</li>
+  <li>When preparing i used books provided by redhat concentrate on concepts and solve the examples given in the books.</li>
+  <li>Everything is in man pages, examples on important things like teaming,etc are provided in the man pages you can easily get reference from there for faster execution</li>
+  <li>If you got struck in any question leave it go for next at the end when you have time try solving it, don’t take more than 10 mins solving a question</li>
+  <li>Enable all the required firewall ports once, install all the packages at once in the beginning, you will definitely save a huge amount of time in this</li>
+  <li>Restart after every entry in /etc/fstab to check you have done correctly. At the end don’t forget to restart you systems.</li>
+  <li>Write down important things in the paper provided to you in exam it will save time when working &amp; checking.</li>
+</ol>
 
-&lt;p&gt;&lt;strong&gt;Important&lt;/strong&gt;&lt;br /&gt;
+<p><strong>Important</strong><br />
 Practice as much as Possible
-Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="rhce" /><summary type="html"></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T16:32:06+05:30</published><updated>2016-06-07T16:32:06+05:30</updated><id>https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment">&lt;p&gt;&lt;img src=&quot;/assets/images/virtualbox.jpg&quot; alt=&quot;Setup Virtualbox for Local Development Environment&quot; /&gt;&lt;/p&gt;
+Remember when you are practising, follow this approach – Try solving the problems with less time, Execute the problems with minimising time.</p>]]></content><author><name>Shreyas M M</name></author><category term="others" /><category term="rhce" /><summary type="html"><![CDATA[How clear RHCE, Some tips on how to clear the RHCE,RHCSA is very easy it involves many basic Linux things RHCE is more advanced.]]></summary></entry><entry><title type="html">Setup Virtualbox for Local Development Environment</title><link href="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment" rel="alternate" type="text/html" title="Setup Virtualbox for Local Development Environment" /><published>2016-06-07T11:02:06+00:00</published><updated>2016-06-07T11:02:06+00:00</updated><id>https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment</id><content type="html" xml:base="https://www.shreyasmm.com/setup-virtualbox-for-local-development-environment"><![CDATA[<p><img src="/assets/images/virtualbox.jpg" alt="Setup Virtualbox for Local Development Environment" /></p>
 
-&lt;p&gt;Hi Today i am going show you how to setup virtualbox for local Development which will be useful when you are developing / deploying application inside the virtual machine and want to interact with it outside the virtual machine or from host machine,this is also helpful when you are developing for openstack you have installed openstack in vm and want to interact and test the api from host machine, before starting download &amp;amp; install &lt;a href=&quot;https://www.virtualbox.org&quot;&gt;Virtualbox&lt;/a&gt;.&lt;/p&gt;
+<p>Hi Today i am going show you how to setup virtualbox for local Development which will be useful when you are developing / deploying application inside the virtual machine and want to interact with it outside the virtual machine or from host machine,this is also helpful when you are developing for openstack you have installed openstack in vm and want to interact and test the api from host machine, before starting download &amp; install <a href="https://www.virtualbox.org">Virtualbox</a>.</p>
 
-&lt;p&gt;Watch Video Tutorial Over Here&lt;/p&gt;
+<p>Watch Video Tutorial Over Here</p>
 
-&lt;style&gt;.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }&lt;/style&gt;
-&lt;div class=&quot;embed-container&quot;&gt;    &lt;iframe title=&quot;YouTube video player&quot; width=&quot;640&quot; height=&quot;390&quot; src=&quot;//www.youtube.com/embed/qIxnx21sUDk&quot; frameborder=&quot;0&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;&lt;/div&gt;
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style>
+<div class="embed-container">    <iframe title="YouTube video player" width="640" height="390" src="//www.youtube.com/embed/qIxnx21sUDk" frameborder="0" allowfullscreen=""></iframe></div>
 
-&lt;h3 id=&quot;create-host-only-network-adapter&quot;&gt;Create Host only network adapter&lt;/h3&gt;
+<h3 id="create-host-only-network-adapter">Create Host only network adapter</h3>
 
-&lt;p&gt;Click on File -&amp;gt; Preference
-&lt;img src=&quot;/assets/images/virtualbox1.png&quot; alt=&quot;Create Host only network adapter 1&quot; /&gt;&lt;/p&gt;
+<p>Click on File -&gt; Preference
+<img src="/assets/images/virtualbox1.png" alt="Create Host only network adapter 1" /></p>
 
-&lt;p&gt;Choose Network, Click Host-only Networks and click on plus sign
-&lt;img src=&quot;/assets/images/virtualbox2.png&quot; alt=&quot;Create Host only network adapter 2&quot; /&gt;&lt;/p&gt;
+<p>Choose Network, Click Host-only Networks and click on plus sign
+<img src="/assets/images/virtualbox2.png" alt="Create Host only network adapter 2" /></p>
 
-&lt;p&gt;Click on Settings button of vboxnet0
-&lt;img src=&quot;/assets/images/virtualbox3.png&quot; alt=&quot;Create Host only network adapter 3&quot; /&gt;&lt;/p&gt;
+<p>Click on Settings button of vboxnet0
+<img src="/assets/images/virtualbox3.png" alt="Create Host only network adapter 3" /></p>
 
-&lt;p&gt;Under Adapter Tab
-&lt;img src=&quot;/assets/images/virtualbox4.png&quot; alt=&quot;Create Host only network adapter 4&quot; /&gt;&lt;/p&gt;
+<p>Under Adapter Tab
+<img src="/assets/images/virtualbox4.png" alt="Create Host only network adapter 4" /></p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;IPv4 Address 192.168.56.1
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IPv4 Address 192.168.56.1
 IPv4 Network Mask 255.255.255.0
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Under DHCP Server Tab
-&lt;img src=&quot;/assets/images/virtualbox5.png&quot; alt=&quot;Create Host only network adapter 5&quot; /&gt;&lt;br /&gt;
-Check mark the “Enable Server option”&lt;/p&gt;
+<p>Under DHCP Server Tab
+<img src="/assets/images/virtualbox5.png" alt="Create Host only network adapter 5" /><br />
+Check mark the “Enable Server option”</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Server Address 192.168.56.2
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Server Address 192.168.56.2
 Server Mask 255.255.255.0
 Lower Address Bound 192.168.56.3
 Upper Address Bound 192.168.56.240
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;h4 id=&quot;add-host-only-adapter-to-virtual-machine-as-network-adapter-2&quot;&gt;Add Host only adapter to virtual machine as Network Adapter 2&lt;/h4&gt;
+<h4 id="add-host-only-adapter-to-virtual-machine-as-network-adapter-2">Add Host only adapter to virtual machine as Network Adapter 2</h4>
 
-&lt;p&gt;Right Click on the vm and click on settings
-&lt;img src=&quot;/assets/images/virtualbox6.png&quot; alt=&quot;Create Host only network adapter 6&quot; /&gt;&lt;/p&gt;
+<p>Right Click on the vm and click on settings
+<img src="/assets/images/virtualbox6.png" alt="Create Host only network adapter 6" /></p>
 
-&lt;p&gt;Choose Network , Under Adapter 2&lt;br /&gt;
-Check Enable Network Adapter&lt;br /&gt;
-Attached to: Host-only Adapter&lt;br /&gt;
+<p>Choose Network , Under Adapter 2<br />
+Check Enable Network Adapter<br />
+Attached to: Host-only Adapter<br />
 Name: vboxnet0
-&lt;img src=&quot;/assets/images/virtualbox7.png&quot; alt=&quot;Create Host only network adapter 7&quot; /&gt;&lt;/p&gt;
+<img src="/assets/images/virtualbox7.png" alt="Create Host only network adapter 7" /></p>
 
-&lt;p&gt;Then boot the vm and run &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo vim /etc/network/interfaces&lt;/code&gt;
-Add These two lines at end&lt;/p&gt;
+<p>Then boot the vm and run <code class="language-plaintext highlighter-rouge">sudo vim /etc/network/interfaces</code>
+Add These two lines at end</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;auto enp0s8
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>auto enp0s8
 iface enp0s8 inet dhcp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Save the file and reboot the vm&lt;/p&gt;
+<p>Save the file and reboot the vm</p>
 
-&lt;p&gt;Full Contents of &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/network/interfaces&lt;/code&gt; file&lt;/p&gt;
+<p>Full Contents of <code class="language-plaintext highlighter-rouge">/etc/network/interfaces</code> file</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# The loopback network interface&lt;/span&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># The loopback network interface</span>
 auto lo
 iface lo inet loopback
 
-&lt;span class=&quot;c&quot;&gt;# The primary network interface&lt;/span&gt;
+<span class="c"># The primary network interface</span>
 auto enp0s3
 iface enp0s3 inet dhcp
 
 auto enp0s8
 iface enp0s8 inet dhcp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Once the vm is booted find the ip address given by hostonly adapter by running &lt;code class=&quot;highlighter-rouge&quot;&gt;ip a&lt;/code&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;enp0s8&lt;/code&gt;  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run &lt;code class=&quot;highlighter-rouge&quot;&gt;ping [ip address of vm]&lt;/code&gt;, install webserver on vm open it on host machine.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="https://www.shreyasmm.com/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T16:32:06+05:30</published><updated>2016-03-09T16:32:06+05:30</updated><id>https://www.shreyasmm.com/install-django-on-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-django-on-ubuntu">&lt;p&gt;&lt;img src=&quot;/assets/images/installing-django-on-ubuntu.jpg&quot; alt=&quot;Installing Django on Ubuntu&quot; /&gt;&lt;/p&gt;
+<p>Once the vm is booted find the ip address given by hostonly adapter by running <code class="language-plaintext highlighter-rouge">ip a</code> of <code class="language-plaintext highlighter-rouge">enp0s8</code>  interface. Once you get that ip address you can ping, ssh, ftp or if you are running a webserver in vm you can access it from host machine. From your host machine run <code class="language-plaintext highlighter-rouge">ping [ip address of vm]</code>, install webserver on vm open it on host machine.</p>]]></content><author><name>Shreyas M M</name></author><category term="ubuntu" /><category term="videos" /><category term="development-environment" /><category term="openstack" /><category term="virtualbox" /><summary type="html"><![CDATA[I am going show you how to setup virtualbox for local Dev env which will be useful when you are developing/deploying application inside the virtual machine.]]></summary></entry><entry><title type="html">Install Django on Ubuntu</title><link href="https://www.shreyasmm.com/install-django-on-ubuntu" rel="alternate" type="text/html" title="Install Django on Ubuntu" /><published>2016-03-09T11:02:06+00:00</published><updated>2016-03-09T11:02:06+00:00</updated><id>https://www.shreyasmm.com/install-django-on-ubuntu</id><content type="html" xml:base="https://www.shreyasmm.com/install-django-on-ubuntu"><![CDATA[<p><img src="/assets/images/installing-django-on-ubuntu.jpg" alt="Installing Django on Ubuntu" /></p>
 
-&lt;p&gt;Today i am going to show how to setup or install &lt;a href=&quot;https://www.djangoproject.com&quot;&gt;Django&lt;/a&gt; environment on Ubuntu. I will be concentrating only on python 3 version. Django is web application framework written in python, It Uses MVT (Models, Views, Templates) Concept .&lt;/p&gt;
+<p>Today i am going to show how to setup or install <a href="https://www.djangoproject.com">Django</a> environment on Ubuntu. I will be concentrating only on python 3 version. Django is web application framework written in python, It Uses MVT (Models, Views, Templates) Concept .</p>
 
-&lt;p&gt;We will be installing django in an isolated environment but why? simple because we do not want django packages to mess with os python libraries, we will be using pip to install packages and virtualenv to create virtual environments.pip is a package management system used to install and manage software packages written in Python. Now open your terminal and follow this commands&lt;/p&gt;
+<p>We will be installing django in an isolated environment but why? simple because we do not want django packages to mess with os python libraries, we will be using pip to install packages and virtualenv to create virtual environments.pip is a package management system used to install and manage software packages written in Python. Now open your terminal and follow this commands</p>
 
-&lt;p&gt;Install python3 Pip&lt;/p&gt;
+<p>Install python3 Pip</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;apt-get &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;python3-pip
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>python3-pip
+</code></pre></div></div>
 
-&lt;p&gt;Install Virtualenv&lt;/p&gt;
+<p>Install Virtualenv</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;pip3 &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;virtualenv
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>pip3 <span class="nb">install </span>virtualenv
+</code></pre></div></div>
 
-&lt;p&gt;Create new directory for your project&lt;/p&gt;
+<p>Create new directory for your project</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; Code/Django/myapp
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;Code/Django/myapp
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> Code/Django/myapp
+<span class="nb">cd </span>Code/Django/myapp
+</code></pre></div></div>
 
-&lt;p&gt;Create new Virtual Environment we will call it py3&lt;/p&gt;
+<p>Create new Virtual Environment we will call it py3</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtualenv py3
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtualenv py3
+</code></pre></div></div>
 
-&lt;p&gt;Once you run above command new directory py3 will be created. Now We need to activate our new py3 environment&lt;/p&gt;
+<p>Once you run above command new directory py3 will be created. Now We need to activate our new py3 environment</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;py3/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source </span>py3/bin/activate
+</code></pre></div></div>
 
-&lt;p&gt;your prompt will be changed to &lt;code class=&quot;highlighter-rouge&quot;&gt;(py3) Code/Django/myapp&lt;/code&gt;&lt;/p&gt;
+<p>your prompt will be changed to <code class="language-plaintext highlighter-rouge">(py3) Code/Django/myapp</code></p>
 
-&lt;p&gt;Now Install Django. Notice we are not running pip3 command, we will just  run pip inside virtualenv&lt;/p&gt;
+<p>Now Install Django. Notice we are not running pip3 command, we will just  run pip inside virtualenv</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;pip &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;django
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip <span class="nb">install </span>django
+</code></pre></div></div>
 
-&lt;p&gt;Once Django is installed, you can check the version by&lt;/p&gt;
+<p>Once Django is installed, you can check the version by</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;django-admin &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>django-admin <span class="nt">--version</span>
 1.9.2
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</code></pre></div></div>
 
-&lt;p&gt;Lets start new project call makeinindia&lt;/p&gt;
+<p>Lets start new project call makeinindia</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;django-admin startproject makeinindia
-&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;makeinindia
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>django-admin startproject makeinindia
+<span class="nb">cd </span>makeinindia
+</code></pre></div></div>
 
-&lt;p&gt;Lets start new app blog&lt;/p&gt;
+<p>Lets start new app blog</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python manage.py startapp blog
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python manage.py startapp blog
+</code></pre></div></div>
 
-&lt;p&gt;Now we will start the server&lt;/p&gt;
+<p>Now we will start the server</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python manage.py runserver
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python manage.py runserver
+</code></pre></div></div>
 
-&lt;p&gt;Finally done, Whenever you want to leave the virtual environment just run to &lt;code class=&quot;highlighter-rouge&quot;&gt;deactivate&lt;/code&gt;&lt;/p&gt;
+<p>Finally done, Whenever you want to leave the virtual environment just run to <code class="language-plaintext highlighter-rouge">deactivate</code></p>
 
-&lt;p&gt;Dont forget  to run this command Every time you want to work with your Django app&lt;/p&gt;
+<p>Dont forget  to run this command Every time you want to work with your Django app</p>
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;Code/Django/myapp
-&lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;py3/bin/activate
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name>Shreyas M M</name></author><category term="django" /><category term="ubuntu" /><summary type="html"></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="https://www.shreyasmm.com/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T16:32:06+05:30</published><updated>2015-12-10T16:32:06+05:30</updated><id>https://www.shreyasmm.com/device-drivers-linux</id><content type="html" xml:base="https://www.shreyasmm.com/device-drivers-linux">&lt;p&gt;&lt;img src=&quot;/assets/images/device-drivers.jpg&quot; alt=&quot;Device Drivers in Linux&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>Code/Django/myapp
+<span class="nb">source </span>py3/bin/activate
+</code></pre></div></div>]]></content><author><name>Shreyas M M</name></author><category term="ubuntu" /><category term="django" /><category term="ubuntu" /><summary type="html"><![CDATA[In this guide we will show how to install django on ubuntu using virtualenv and pip.we will install django in isolated environment.]]></summary></entry><entry><title type="html">Device Drivers in Linux</title><link href="https://www.shreyasmm.com/device-drivers-linux" rel="alternate" type="text/html" title="Device Drivers in Linux" /><published>2015-12-10T11:02:06+00:00</published><updated>2015-12-10T11:02:06+00:00</updated><id>https://www.shreyasmm.com/device-drivers-linux</id><content type="html" xml:base="https://www.shreyasmm.com/device-drivers-linux"><![CDATA[<p><img src="/assets/images/device-drivers.jpg" alt="Device Drivers in Linux" class=".center" /></p>
 
-&lt;p&gt;This is my Advance Operating System Assignment. I will show how to Compile Linux Kernel from Source,You can download Linux Kernel From &lt;a href=&quot;https://www.kernel.org&quot;&gt;Here&lt;/a&gt;.&lt;/p&gt;
+<p>This is my Advance Operating System Assignment. I will show how to Compile Linux Kernel from Source,You can download Linux Kernel From <a href="https://www.kernel.org">Here</a>.</p>
 
-&lt;p&gt;https://www.slideshare.net/MMShreyas/device-drivers-in-linux&lt;/p&gt;
+<p>https://www.slideshare.net/MMShreyas/device-drivers-in-linux</p>
 
-&lt;p&gt;I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="linux" /><category term="presentations" /><summary type="html"></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T16:32:06+05:30</published><updated>2015-12-05T16:32:06+05:30</updated><id>https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes">&lt;p&gt;&lt;img src=&quot;/assets/images/containers-cloud-lxc-docker-kubernetes.jpg&quot; alt=&quot;Containers and Cloud: From LXC to Docker to Kubernetes&quot; class=&quot;.center&quot; /&gt;&lt;/p&gt;
+<p>I also show how Device Drivers are implemented as Kernel modules, What is Purpose of Udev, How you can Manually load and unload Kernel modules at Run time.</p>]]></content><author><name>Shreyas M M</name></author><category term="presentations" /><category term="ubuntu" /><category term="linux" /><category term="presentations" /><summary type="html"><![CDATA[Compiling Linux Kernel From Source, How Device Drivers are Implemented in Linux, Manually Loading of Kernel Modules, Purpose of Udev.]]></summary></entry><entry><title type="html">Containers and Cloud: From LXC to Docker to Kubernetes</title><link href="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes" rel="alternate" type="text/html" title="Containers and Cloud: From LXC to Docker to Kubernetes" /><published>2015-12-05T11:02:06+00:00</published><updated>2015-12-05T11:02:06+00:00</updated><id>https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes</id><content type="html" xml:base="https://www.shreyasmm.com/containers-cloud-lxc-docker-kubernetes"><![CDATA[<p><img src="/assets/images/containers-cloud-lxc-docker-kubernetes.jpg" alt="Containers and Cloud: From LXC to Docker to Kubernetes" class=".center" /></p>
 
-&lt;p&gt;Well this is December a month full of Exams, Assignments, Seminars.This is my Seminar Topic Containers and Cloud: From LXC to Docker to Kubernetes, it speaks about how present Cloud system is moving from Hypervisors to Docker &amp;amp; Kubernetes.&lt;/p&gt;
+<p>Well this is December a month full of Exams, Assignments, Seminars.This is my Seminar Topic Containers and Cloud: From LXC to Docker to Kubernetes, it speaks about how present Cloud system is moving from Hypervisors to Docker &amp; Kubernetes.</p>
 
-&lt;p&gt;https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="cloud" /><category term="docker" /><summary type="html"></summary></entry><entry><title type="html">AVL Trees Implementation in Python</title><link href="https://www.shreyasmm.com/avl-trees-implementation-in-python" rel="alternate" type="text/html" title="AVL Trees Implementation in Python" /><published>2015-11-16T16:32:06+05:30</published><updated>2015-11-16T16:32:06+05:30</updated><id>https://www.shreyasmm.com/avl-trees-implementation-in-python</id><content type="html" xml:base="https://www.shreyasmm.com/avl-trees-implementation-in-python">&lt;p&gt;&lt;img src=&quot;/assets/images/py-avl.jpg&quot; alt=&quot;AVL Trees Implementation in Python&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;I had an Assignment Recently in Advance Data Structures Course to implement AVL Trees. So Here is the source code for it. I am not going to explain what AVL Trees is, since there are many better tutorials out there.
-Download from Here or Clone the GitHub Repository enter below command&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/shreyasmm/AVL-Trees
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You need to have python installed in your windows system, Linux Systems will have by default
-its better to have a IDE for editing python code like PyCharms (Optional)
-Execute Command in Terminal&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;python avl.py
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Output
-&lt;img src=&quot;/assets/images/py-avl-output1.jpg&quot; alt=&quot;AVL Trees Output 1&quot; /&gt;
-&lt;img src=&quot;/assets/images/py-avl-output2.jpg&quot; alt=&quot;AVL Trees Output 2&quot; /&gt;&lt;/p&gt;</content><author><name>Shreyas M M</name></author><category term="avl-trees" /><category term="python" /><summary type="html"></summary></entry></feed>
+<p>https://www.slideshare.net/MMShreyas/containers-and-cloud-from-lxc-to-docker-to-kubernetes</p>]]></content><author><name>Shreyas M M</name></author><category term="presentations" /><category term="cloud" /><category term="docker" /><summary type="html"><![CDATA[My Seminar Presentation, it speaks about how present Cloud system is moving from Hypervisors to Docker & Kubernetes.]]></summary></entry></feed>
